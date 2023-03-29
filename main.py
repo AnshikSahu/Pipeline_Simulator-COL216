@@ -80,4 +80,4 @@ class Pipeline:
     def refresh(self):
         self.previous=None
         self.pseudoregisterfile=self.registerfile
-        self.stageemptytime=self.pseudostageemptytime 
+        self.pseudostageemptytime=self.stageemptytime      
