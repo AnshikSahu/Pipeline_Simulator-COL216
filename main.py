@@ -34,7 +34,7 @@ class Simulator:
             self.pseudoregisterfile=Registerfile(self.numberofregisters)
             self.pseudoruntimelist=[]
             self.history=[]
-        def run(self,in1,in2):
+        def run(self,in1):
             command=Command(False,in1.stagelengths,[in1.destinationregister,in1.sourceregister1,in1.sourceregister2],in1.bypassindex,in1.readindex,in1.intermediatelatchlength,in1.stagenames,[0,0])
             if(in1.intermediatelatchesactive):
                 command.stagelengths=[command.stagelengths[i]+command.intermediatelatchlength for i in range(command.numberofstages)]
@@ -108,6 +108,7 @@ class Simulator:
         self.pipeline=Pipeline(in2[0],in2[1],in2[2],in2[3])
         self.scheduler=Scheduler()
     def addcommand(self,in1,in2):
+#         add commands from pareser
 
     def execute(self):
-        
+#         keep saving the code from pipeline 
