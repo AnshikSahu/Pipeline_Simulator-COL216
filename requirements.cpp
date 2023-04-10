@@ -170,5 +170,9 @@ void insert_halt(Command* command, Pipeline* pipeline) {
 struct Runtimedata* run(Pipeline* pipeline, Command* command){
 }
 
+int main(){
+    return 0;
+}
+
 
 // Path: requirements.h
