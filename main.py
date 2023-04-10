@@ -44,7 +44,7 @@ class Simulator:
             if(self.symmetryactive):
                 command.stagelengths=[max(command.stagelengths)]*command.numberofstages
             runtime=Runtimedata(command,self.stageemptytime[0],command.numberofstages)
-            runtime.stages[0]=[command.stagenames[0],self.stageemptytime[0],None]
+            runtime.stages[0]=[command.stagenames[0],self.stageemptytime[0],None]                
             for i in range(command.numberofstages-1):
                 endtime=runtime.stages[i][1]+command.stagelengths[i]
                 if(endtime<self.stageemptytime[i+1]):
@@ -66,11 +66,14 @@ class Simulator:
                                 endtime = self.pseudoregisterfile.updatetime[command.sourceregister2]
                 if(i==command.readindex):
                     self.pseudoregisterfile.intermediateupdatetime[command.destinationregister]=endtime
+                if(i==command.writeindex):#new
+                    self.pseudoregisterfile.updatetime[command.destinationregister]=endtime#new
                 runtime.stages[i][2]=endtime
                 runtime.stages[i+1]=[command.stagenames[i+1],endtime,None]
                 self.pseudostageemptytime[i]=endtime
             self.pseudostageemptytime[command.numberofstages-1]=runtime.stages[command.numberofstages-1][1]+command.stagelengths[command.numberofstages-1]
-            self.pseudoregisterfile.updatetime[command.destinationregister]=self.pseudostageemptytime[command.numberofstages-1]
+            if(command.writeindex==command.numberofstages-1):#new
+                self.pseudoregisterfile.updatetime[command.destinationregister]=self.pseudostageemptytime[command.numberofstages-1]#new
             runtime.stages[command.numberofstages-1][2]=self.pseudostageemptytime[command.numberofstages-1]
             self.pseudoruntimelist.append(runtime)
             return runtime
