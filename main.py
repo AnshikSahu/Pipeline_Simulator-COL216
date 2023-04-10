@@ -1,18 +1,20 @@
 class Simulator:
     class Command:
-        def __init__(self,in1,in2,in3,in4,in5,in6,in7,in8):
+        def __init__(self,in1,in2,in3,in4,in5,in6,in7,in8,in9):
             self.intermediatelatchesactive=in1
-            self.intermediatelatchlength=in6
-            self.numberofstages=len(in2)
-            self.stagelengths=in2
-            self.bypassindex=in4
-            self.readindex=in5
-            self.destinationregister=in3[0]
-            self.sourceregister1=in3[1]
-            self.sourceregister2=in3[2]
-            self.stagenames=in7
-            self.isbranch=in8[0]
-            self.jumpindex=in8[1]
+            self.intermediatelatchlength=in2
+            self.numberofstages=len(in3)
+            self.stagelengths=in3
+            self.bypassindex=in4[0]
+            self.readindex=in4[1]
+            self.writeindex=in4[2]
+            self.destinationregister=in5[0]
+            self.sourceregister1=in5[1]
+            self.sourceregister2=in5[2]
+            self.stagenames=in6
+            self.opcode=in7
+            self.value=in8
+            self.constant=in9
     class Registerfile:
         def __init__(self,in1):
             self.size=in1
@@ -35,7 +37,7 @@ class Simulator:
             self.pseudoruntimelist=[]
             self.history=[]
         def run(self,in1):
-            command=Command(False,in1.stagelengths,[in1.destinationregister,in1.sourceregister1,in1.sourceregister2],in1.bypassindex,in1.readindex,in1.intermediatelatchlength,in1.stagenames,[0,0])
+            command=Command(in1.intermediatelatchesactive,in1.intermediatelatchlength,in1.stagelengths,[in1.destinationregister,in1.sourceregister1,in1.sourceregister2],[in1.bypassindex,in1.readindex,in1.writeindex],in1.stagenames,in1.opcode,in1.value,in1.constant)
             if(in1.intermediatelatchesactive):
                 command.stagelengths=[command.stagelengths[i]+command.intermediatelatchlength for i in range(command.numberofstages)]
                 command.stagelengths[command.numberofstages-1]=command.stagelengths[command.numberofstages-1]-command.intermediatelatchlength
