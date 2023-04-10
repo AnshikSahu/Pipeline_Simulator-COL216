@@ -39,6 +39,7 @@ struct Registerfile* copy_file(Registerfile* in1);
 struct Runtimedata{
     Command* command;
     int starttime;
+    vector<string> stagenames;
     vector<vector<int> > stages;
 };
 
