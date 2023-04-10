@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 
-struct Command* new_Command(bool in1, int in2, vector<int> in3, vector<int> in4, vector<int> in5, vector<string> in6, int in7, int in8, int in9) {
+struct Command* new_Command(bool in1, int in2, vector<int> in3, vector<int> in4, vector<int> in5, vector<string> in6, string in7, int in8, int in9) {
         struct Command* newcommand = (struct Command*) malloc(sizeof( struct Command));
         newcommand->intermediatelatchesactive = in1;
         newcommand->intermediatelatchlength = in2;
