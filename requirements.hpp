@@ -53,8 +53,8 @@ struct Pipeline{
     vector<int> stageemptytime;
     vector<int> pseudostageemptytime;
     int numberofregisters;
-    struct Registerfile* registerfile=new_Registerfile(numberofregisters);
-    struct Registerfile* pseudoregisterfile=new_Registerfile(numberofregisters);
+    struct Registerfile* registerfile;
+    struct Registerfile* pseudoregisterfile;
     vector<Runtimedata*> pseudoruntimelist;
     vector<Runtimedata*> history;
     int starttime;
