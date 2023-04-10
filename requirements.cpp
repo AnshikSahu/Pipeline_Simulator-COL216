@@ -36,7 +36,8 @@ struct Runtimedata* new_Runtimedata(Command* in1, int in2, int in3) {
     struct Runtimedata* newruntimedata = (struct Runtimedata*) malloc(sizeof( struct Runtimedata));
     newruntimedata->command = in1;
     newruntimedata->starttime = in2;
-    newruntimedata->stages = vector<vector<int> >(in3, vector<int>(3,0));
+    newruntimedata->stagenames = vector<string>(in3,"");
+    newruntimedata->stages = vector<vector<int> >(in3, vector<int>(2,0));
     return newruntimedata;
 }
 
@@ -71,6 +72,79 @@ struct Pipeline* new_Pipeline(int in1, bool in2, bool in3, int in4, int in5) {
     newpipeline->history = vector<Runtimedata*>();
     newpipeline->starttime = in5;
     return newpipeline;
+}
+
+struct Runtimedata* run_command(Pipeline* pipeline, Command* in1){
+    vector<int> v = {in1->destinationregister,in1->sourceregister1,in1->sourceregister2};
+    vector<int> v1 = {in1->bypassindex,in1->readindex,in1->writeindex};
+    struct Command* command = (struct Command*) new_Command(false,in1->intermediatelatchlength,in1->stagelengths,v1,v,in1->stagenames,in1->opcode,in1->value,in1->constant);
+    if (in1->intermediatelatchesactive){
+        int x = command->intermediatelatchlength;
+        for (int j=0; j<command->stagelengths.size(); j++){
+            x+=command->stagelengths[j];
+        }
+        command->stagelengths= {x};
+        command->stagelengths[command->numberofstages-1]=command->stagelengths[command->numberofstages-1]-command->intermediatelatchlength;
+    }
+    if (pipeline->symmetryactive){
+        command->stagelengths= vector<int>(command->numberofstages,*max_element(command->stagelengths.begin(),command->stagelengths.end()));
+    }
+    struct Runtimedata* runtime = (struct Runtimedata*) new_Runtimedata(command,pipeline->stageemptytime[0],command->numberofstages);
+    runtime->stagenames[0]=command->stagenames[0];
+    runtime->stages[0]={pipeline->stageemptytime[0],-1};
+    for (int j=0;j<command->numberofstages-1;j++){
+
+        int endtime = runtime->stages[j][1]+command->stagelengths[j];
+        if (endtime<pipeline->stageemptytime[j+1]){
+            endtime= pipeline->stageemptytime[j+1];
+
+        }
+        if (j+1==command->bypassindex){
+            if (pipeline->bypassactive){
+                if (command->sourceregister1!=-1){
+                    if(pipeline->pseudoregisterfile->intermediateupdatetime[command->sourceregister1]>endtime){
+                        endtime=pipeline->pseudoregisterfile->intermediateupdatetime[command->sourceregister1];
+                    }
+                }
+                if (command->sourceregister2!=-1){
+                    if(pipeline->pseudoregisterfile->intermediateupdatetime[command->sourceregister2]>endtime){
+                        endtime=pipeline->pseudoregisterfile->intermediateupdatetime[command->sourceregister2];
+                    }
+                }
+            }
+            else{
+                if (command->sourceregister1 != -1){
+                    if (pipeline->pseudoregisterfile->updatetime[command->sourceregister1] > endtime){
+                        endtime = pipeline->pseudoregisterfile->updatetime[command->sourceregister1];
+                    }
+                }
+                if (command->sourceregister2 != -1){
+                    if (pipeline->pseudoregisterfile->updatetime[command->sourceregister2] > endtime){
+                        endtime = pipeline->pseudoregisterfile->updatetime[command->sourceregister2];
+                    }
+                }              
+            }
+        }
+        if(j==command->readindex){
+            pipeline->pseudoregisterfile->intermediateupdatetime[command->destinationregister]=endtime;
+            // new next two lines
+                if (j==command->writeindex){
+                    pipeline->pseudoregisterfile->updatetime[command->destinationregister]=endtime;
+                }
+            }
+        runtime->stages[j][2]=endtime;
+        runtime->stagenames[j+1] =command->stagenames[j+1];
+        runtime->stages[j+1] = {endtime,-1};
+        pipeline->pseudostageemptytime[j]=endtime;
+        }
+    pipeline->pseudostageemptytime[command->numberofstages-1]=runtime->stages[command->numberofstages-1][1]+command->stagelengths[command->numberofstages-1];
+    // next two lines are new
+    if(command->writeindex==command->numberofstages-1){
+        pipeline->pseudoregisterfile->updatetime[command->destinationregister]=pipeline->pseudostageemptytime[command->numberofstages-1];
+    }
+    runtime->stages[command->numberofstages-1][2]=pipeline->pseudostageemptytime[command->numberofstages-1];
+    pipeline->pseudoruntimelist.push_back(runtime);
+    return runtime;
 }
 
 void save(Pipeline* pipeline ) {
