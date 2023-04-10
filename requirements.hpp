@@ -18,12 +18,12 @@ struct Command{
     int sourceregister1;
     int sourceregister2;
     vector<string> stagenames;
-    int opcode;
+    string opcode;
     int value;
     int constant;
 };
 
-struct Command* new_Command(bool in1, int in2, vector<int> in3, vector<int> in4, vector<int> in5, vector<string> in6, int in7, int in8, int in9);
+struct Command* new_Command(bool in1, int in2, vector<int> in3, vector<int> in4, vector<int> in5, vector<string> in6, string in7, int in8, int in9);
 
 struct Registerfile{
     int size;
@@ -39,6 +39,7 @@ struct Registerfile* copy_file(Registerfile* in1);
 struct Runtimedata{
     Command* command;
     int starttime;
+    vector<string> stagenames;
     vector<vector<int> > stages;
 };
 
