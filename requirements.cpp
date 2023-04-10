@@ -1,23 +1,24 @@
-#include "./requirements.h"
+#include "./requirements.hpp"
 #include <stdlib.h>
 #include <vector>
 #include <string>
 using namespace std;
 
-struct Command* new_Command(bool in1, vector<int> in2, vector<int> in3, int in4, int in5, int in6, int in7, vector<int> in8) {
+struct Command* new_Command(bool in1, int in2, vector<int> in3, vector<int> in4, vector<int> in5, vector<string> in6, int in7, int in8, int in9) {
         struct Command* newcommand = (struct Command*) malloc(sizeof( struct Command));
         newcommand->intermediatelatchesactive = in1;
-        newcommand->intermediatelatchlength = in6;
-        newcommand->numberofstages = in2.size();
-        newcommand->stagelengths = in2;
-        newcommand->bypassindex = in4;
-        newcommand->readindex = in5;
-        newcommand->destinationregister = in3[0];
-        newcommand->sourceregister1 = in3[1];
-        newcommand->sourceregister2 = in3[2];
-        newcommand->stagenames = vector<string>(in7);
-        newcommand->isbranch = in8[0];
-        newcommand->jumpindex = in8[1];
+        newcommand->intermediatelatchlength = in2;
+        newcommand->numberofstages = in3.size();
+        newcommand->stagelengths = in3;
+        newcommand->bypassindex = in4[0];
+        newcommand->readindex = in4[1];
+        newcommand->writeindex = in4[2];
+        newcommand->destinationregister = in5[0];
+        newcommand->sourceregister1 = in5[1];
+        newcommand->sourceregister2 = in5[2];
+        newcommand->stagenames = in7;
+        newcommand->opcode = in8;
+        newcommand->constant = in9;
         return newcommand;
     }
 
@@ -92,7 +93,6 @@ void insert_halt(Command* command, Pipeline* pipeline) {
 }
 
 struct Runtimedata* run(Pipeline* pipeline, Command* command){
-    return new_Runtimedata(command, pipeline->starttime, command->numberofstages);
 }
 
 
