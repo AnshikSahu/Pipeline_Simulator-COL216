@@ -13,15 +13,17 @@ struct Command{
     vector<int> stagelengths;
     int bypassindex;
     int readindex;
+    int writeindex;
     int destinationregister;
     int sourceregister1;
     int sourceregister2;
     vector<string> stagenames;
-    bool isbranch;
-    int jumpindex;
+    int opcode;
+    int value;
+    int constant;
 };
 
-struct Command* new_Command(bool in1, vector<int> in2, vector<int> in3, int in4, int in5, int in6, int in7, vector<int> in8);
+struct Command* new_Command(bool in1, int in2, vector<int> in3, vector<int> in4, vector<int> in5, vector<string> in6, int in7, int in8, int in9);
 
 struct Registerfile{
     int size;
