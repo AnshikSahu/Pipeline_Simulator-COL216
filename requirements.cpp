@@ -136,13 +136,14 @@ struct Runtimedata* run_command(Pipeline* pipeline, Command* in1){
                 }              
             }
         }
-        if(j==command->readindex){
-            pipeline->pseudoregisterfile->intermediateupdatetime[command->destinationregister]=endtime;
-            // new next two lines
-                if (j==command->writeindex){
-                    pipeline->pseudoregisterfile->updatetime[command->destinationregister]=endtime;
-                }
+        if(command->destinationregister!=-1){
+            if(j==command->readindex){
+                pipeline->pseudoregisterfile->intermediateupdatetime[command->destinationregister]=endtime;}
+                // new next two lines
+            if (j==command->writeindex){
+                pipeline->pseudoregisterfile->updatetime[command->destinationregister]=endtime;
             }
+        }
         runtime->stages[j][2]=endtime;
         runtime->stagenames[j+1] =command->stagenames[j+1];
         runtime->stages[j+1] = {endtime,-1};
@@ -150,8 +151,14 @@ struct Runtimedata* run_command(Pipeline* pipeline, Command* in1){
         }
     pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[command->numberofstages-1]]]=runtime->stages[command->numberofstages-1][1]+command->stagelengths[command->numberofstages-1];
     // next two lines are new
-    if(command->writeindex==command->numberofstages-1){
-        pipeline->pseudoregisterfile->updatetime[command->destinationregister]=pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[command->numberofstages-1]]];
+    if(command->destinationregister!=-1){
+        if(command->writeindex==command->numberofstages-1){
+            pipeline->pseudoregisterfile->updatetime[command->destinationregister]=pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[command->numberofstages-1]]];
+        }
+        if(command->readindex==command->numberofstages-1){
+            pipeline->pseudoregisterfile->intermediateupdatetime[command->destinationregister]=pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[command->numberofstages-1]]];
+        }
+        pipeline->registerfile->values[command->destinationregister]=command->value;
     }
     runtime->stages[command->numberofstages-1][2]=pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[command->numberofstages-1]]];
     pipeline->pseudoruntimelist.push_back(runtime);
