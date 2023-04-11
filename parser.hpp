@@ -5,7 +5,9 @@
 #include <string>
 #include <functional>
 #include <vector>
+#include <algorithm>
 #include <fstream>
+#include <stdexcept>
 #include <exception>
 #include <iostream>
 #include <boost/tokenizer.hpp>
@@ -72,7 +74,7 @@ struct MIPS_Architecture
         case 4:
             break;
         default:
-            
+            std:: cerr << "Invalid question number" << std::endl;
             break;
         }
 		constructCommands(file);
@@ -305,12 +307,44 @@ struct MIPS_Architecture
         vector<int> in3=parametrs[1];
         vector<int> in4=indices[command[0]];
         vector<int> in5;
-        switch(command.size()){
-            case 1:
-        }
+        vector<string> command_type1={"add","sub","and","or","slt","mul"}, command_type2={"addi","andi","ori"};
+		vector<string> command_type3={"beq","bne"}, command_type4={"j","jal"};
+		int in9;
+		std::vector<std::string> subsetVec;
+		std::copy_if(originalVec.begin(), originalVec.end(), std::back_inserter(subsetVec), 
+			[](const std::string& s) {
+				return s.find("$") != std::string::npos;
+			}
+		);
+		if(std::find(command_type1.begin(),command_type1.end(),command[0])!=command_type1.end()){
+			in5={registerMap[subsetVec[0]],registerMap[subsetVec[1]],registerMap[subsetVec[2]]};
+			in9=-1;}
+		else if(std::find(command_type2.begin(),command_type2.end(),command[0])!=command_type2.end()){
+			in5={registerMap[subsetVec[0]],registerMap[subsetVec[1]],-1};
+			in9=stoi(command[3]);}
+		else if(command[0]=="lw"){
+			in5={registerMap[subsetVec[0]],registerMap[subsetVec[1]],-1};
+			if(command.size()==4){
+				in9=stoi(command[2]);}
+			else{
+				in9=0;}}
+		else if(command[0]=="sw"){
+			in5={-1,registerMap[subsetVec[0]],registerMap[subsetVec[1]]};
+			if(command.size()==4){
+				in9=stoi(command[2]);}
+			else{
+				in9=0;}}
+		else if(std::find(command_type3.begin(),command_type3.end(),command[0])!=command_type3.end()){
+			in5={-1,registerMap[subsetVec[0]],registerMap[subsetVec[1]]};
+			in9=-1;}
+		else if(std::find(command_type4.begin(),command_type4.end(),command[0])!=command_type4.end()){
+			in5={-1,-1,-1};
+			in9=-1;}
+		else{
+			std:: cout<<"error in command type"<<std::endl;
+		}
         vector<string> in6=stage_names[command[0]];
         string in7=command[0];
-        int in9;
         struct Command* cmd = new_Command(in1,in2,in3,in4,in5,in6,in7,0,in9);
         return cmd;
     }
