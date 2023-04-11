@@ -345,7 +345,7 @@ struct MIPS_Architecture
 		}
         vector<string> in6=stage_names[command[0]];
         string in7=command[0];
-        struct Command* cmd = new_Command(in1,in2,in3,in4,in5,in6,in7,0,in9);
+        struct Command* cmd = new Command(in1,in2,in3,in4,in5,in6,in7,0,in9);
         return cmd;
     }
 
