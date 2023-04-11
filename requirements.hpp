@@ -27,11 +27,13 @@ struct Command{
 
 struct Command* new_Command(bool in1, int in2, vector<int> in3, vector<int> in4, vector<int> in5, vector<string> in6, string in7, int in8, int in9);
 
+void print_command(Command* in1);
+
 struct Registerfile{
     int size;
     vector<int> updatetime;
     vector<int> intermediateupdatetime;
-    vector<int> value;
+    vector<int> values;
 };
 
 struct Registerfile* new_Registerfile(int in1);
@@ -66,12 +68,16 @@ struct Pipeline{
 
 struct Pipeline* new_Pipeline(int in1, bool in2, bool in3, int in4, int in5, vector<string> in6);
 
-struct Runtimedata* run(Pipeline* pipeline ,Command* in1);
+struct Runtimedata* run_command(Pipeline* pipeline ,Command* in1);
 
 void save(Pipeline* pipeline );
 
 void restore(Pipeline* pipeline );
 
 void insert_halt( Command* command, Pipeline* pipeline );
+
+void print_runtime(Runtimedata* runtime);
+
+void print_pipeline(Pipeline* pipeline);
 
 #endif

@@ -311,7 +311,7 @@ struct MIPS_Architecture
 		vector<string> command_type3={"beq","bne"}, command_type4={"j","jal"};
 		int in9;
 		std::vector<std::string> subsetVec;
-		std::copy_if(originalVec.begin(), originalVec.end(), std::back_inserter(subsetVec), 
+		std::copy_if(command.begin(), command.end(), std::back_inserter(subsetVec), 
 			[](const std::string& s) {
 				return s.find("$") != std::string::npos;
 			}
@@ -341,7 +341,7 @@ struct MIPS_Architecture
 			in5={-1,-1,-1};
 			in9=-1;}
 		else{
-			std:: cout<<"error in command type"<<std::endl;
+			std:: cerr <<"error in command type"<<std::endl;
 		}
         vector<string> in6=stage_names[command[0]];
         string in7=command[0];
@@ -353,7 +353,6 @@ struct MIPS_Architecture
 	void parseCommand(std::string line)
 	{
 		// strip until before the comment begins
-        int value=0;
 		line = line.substr(0, line.find('#'));
 		std::vector<std::string> command;
 		boost::tokenizer<boost::char_separator<char>> tokens(line, boost::char_separator<char>(", \t"));
@@ -409,7 +408,6 @@ struct MIPS_Architecture
 				command[3] += " " + command[i];
 		command.resize(4);
 		commands.push_back(command);
-        value=registers[registerMap[command[0]]];
         struct Command* parametric= define(command);
         parametric_commands.push_back(parametric);
 	}
