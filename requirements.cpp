@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <vector>
 #include <string>
+#include <unordered_map>
+#include <algorithm>
 using namespace std;
 // value has to be made dynamically implied in run, stage reordering
 // value contains the value in register
@@ -60,7 +62,7 @@ struct Registerfile* copy_file(Registerfile* in1) {
     return newregisterfile;
 }
 
-struct Pipeline* new_Pipeline(int in1, bool in2, bool in3, int in4, int in5) {
+struct Pipeline* new_Pipeline(int in1, bool in2, bool in3, int in4, int in5, vector<string> in6) {
     struct Pipeline* newpipeline = (struct Pipeline*) malloc(sizeof( struct Pipeline));
     newpipeline->numberofstages = in1;
     newpipeline->bypassactive = in2;
@@ -73,6 +75,13 @@ struct Pipeline* new_Pipeline(int in1, bool in2, bool in3, int in4, int in5) {
     newpipeline->pseudoruntimelist = vector<Runtimedata*>();
     newpipeline->history = vector<Runtimedata*>();
     newpipeline->starttime = in5;
+    std::map<std::string, int> stringIndexMap;
+    int index = 0;
+    for (const auto& str : in6) {
+        stringIndexMap[str] = index;
+        index++;
+    }
+    newpipeline->stagemap= stringIndexMap;
     return newpipeline;
 }
 
@@ -93,12 +102,12 @@ struct Runtimedata* run_command(Pipeline* pipeline, Command* in1){
     }
     struct Runtimedata* runtime = (struct Runtimedata*) new_Runtimedata(command,pipeline->stageemptytime[0],command->numberofstages);
     runtime->stagenames[0]=command->stagenames[0];
-    runtime->stages[0]={pipeline->stageemptytime[0],-1};
+    runtime->stages[0]={pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[0]]],-1};
     for (int j=0;j<command->numberofstages-1;j++){
 
         int endtime = runtime->stages[j][1]+command->stagelengths[j];
-        if (endtime<pipeline->stageemptytime[j+1]){
-            endtime= pipeline->stageemptytime[j+1];
+        if (endtime<pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[j+1]]]){
+            endtime= pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[j+1]]];
 
         }
         if (j+1==command->bypassindex){
@@ -137,14 +146,14 @@ struct Runtimedata* run_command(Pipeline* pipeline, Command* in1){
         runtime->stages[j][2]=endtime;
         runtime->stagenames[j+1] =command->stagenames[j+1];
         runtime->stages[j+1] = {endtime,-1};
-        pipeline->pseudostageemptytime[j]=endtime;
+        pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[j]]]=endtime;
         }
-    pipeline->pseudostageemptytime[command->numberofstages-1]=runtime->stages[command->numberofstages-1][1]+command->stagelengths[command->numberofstages-1];
+    pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[command->numberofstages-1]]]=runtime->stages[command->numberofstages-1][1]+command->stagelengths[command->numberofstages-1];
     // next two lines are new
     if(command->writeindex==command->numberofstages-1){
-        pipeline->pseudoregisterfile->updatetime[command->destinationregister]=pipeline->pseudostageemptytime[command->numberofstages-1];
+        pipeline->pseudoregisterfile->updatetime[command->destinationregister]=pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[command->numberofstages-1]]];
     }
-    runtime->stages[command->numberofstages-1][2]=pipeline->pseudostageemptytime[command->numberofstages-1];
+    runtime->stages[command->numberofstages-1][2]=pipeline->pseudostageemptytime[pipeline->stagemap[command->stagenames[command->numberofstages-1]]];
     pipeline->pseudoruntimelist.push_back(runtime);
     return runtime;
 }

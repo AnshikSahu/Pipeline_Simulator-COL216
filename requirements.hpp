@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <vector>
 #include <string>
+#include <unordered_map>
+#include <algorithm>
 using namespace std;
 
 struct Command{
@@ -59,9 +61,10 @@ struct Pipeline{
     vector<Runtimedata*> pseudoruntimelist;
     vector<Runtimedata*> history;
     int starttime;
+    unordered_map<string, int> stagemap;
 };
 
-struct Pipeline* new_Pipeline(int in1, bool in2, bool in3, int in4, int in5);
+struct Pipeline* new_Pipeline(int in1, bool in2, bool in3, int in4, int in5, vector<string> in6);
 
 struct Runtimedata* run(Pipeline* pipeline ,Command* in1);
 
