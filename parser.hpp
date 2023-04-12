@@ -85,13 +85,13 @@ struct Parser
 			in9=stoi(command[3]);}
 		else if(command[0]=="lw"){
 			in5={registerMap[subsetVec[0]],registerMap[subsetVec[1]],-1};
-			if(command.size()==4){
+			if(std::find(command[2].begin(),command[2].end(),'$')==command[2].end()){
 				in9=stoi(command[2]);}
 			else{
 				in9=0;}}
 		else if(command[0]=="sw"){
 			in5={-1,registerMap[subsetVec[0]],registerMap[subsetVec[1]]};
-			if(command.size()==4){
+			if(std::find(command[2].begin(),command[2].end(),'$')==command[2].end()){
 				in9=stoi(command[2]);}
 			else{
 				in9=0;}}

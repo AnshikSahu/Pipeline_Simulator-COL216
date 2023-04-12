@@ -113,8 +113,15 @@ struct Simulator
 		return 0;
 	}
 	// perform load word operation
-	int lw(std::string r, std::string location, std::string unused1 = "")
+	int lw(std::string r, std::string in1, std::string in2)
 	{
+		std::string location;
+		if(std::find(in1.begin(),in1.end(),'$')!=in1.end()){
+			location=in1;
+		}
+		else{
+			location=in1+"("+in2+")";
+		}
 		if (!checkRegister(r) || registerMap[r] == 0)
 			return 1;
 		int address = locateAddress(location);
@@ -125,8 +132,15 @@ struct Simulator
 		return 0;
 	}
 	// perform store word operation
-	int sw(std::string r, std::string location, std::string unused1 = "")
+	int sw(std::string r, std::string in1, std::string in2)
 	{
+		std::string location;
+		if(std::find(in1.begin(),in1.end(),'$')!=in1.end()){
+			location=in1;
+		}
+		else{
+			location=in1+"("+in2+")";
+		}
 		if (!checkRegister(r))
 			return 1;
 		int address = locateAddress(location);
