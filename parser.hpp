@@ -11,29 +11,16 @@
 #include <iostream>
 #include <boost/tokenizer.hpp>
 #include "requirements.hpp"
-struct MIPS_Architecture
+struct Parser
 {
     vector< struct Command* > parametric_commands;
     vector<vector<int>> parametrs;
     std:: unordered_map<string,vector<int>> indices;
     std:: unordered_map<string,vector<string>> stage_names;
-	int registers[32] = {0};
 	std::unordered_map<std::string, int> registerMap, address;
-	static const int MAX = (1 << 20);
-	int data[MAX >> 2] = {0};
-	std::unordered_map<int, int> memoryDelta;
 	std::vector<std::vector<std::string>> commands;
 	std::vector<int> commandCount;
-	enum exit_code
-	{
-		SUCCESS = 0,
-		INVALID_REGISTER,
-		INVALID_LABEL,
-		INVALID_ADDRESS,
-		SYNTAX_ERROR,
-		MEMORY_ERROR
-	};
-	MIPS_Architecture(std::ifstream &file, int question)
+	Parser(std::ifstream &file, int question)
 	{
 		for (int i = 0; i < 32; ++i)
 			registerMap["$" + std::to_string(i)] = i;
