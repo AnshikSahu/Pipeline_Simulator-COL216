@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <algorithm>
+#include <iostream>
 using namespace std;
 
 struct Command{
@@ -40,11 +41,32 @@ struct Command{
         value = in8;
         constant = in9;
     }
+
+    void print_command() {
+    cout << "intermediatelatchesactive: " << intermediatelatchesactive << endl;
+    cout << "intermediatelatchlength: " << intermediatelatchlength << endl;
+    cout << "numberofstages: " << numberofstages << endl;
+    cout << "stagelengths: ";
+    for (int i = 0; i < (int)stagelengths.size(); i++) {
+        cout << stagelengths[i] << " ";
+    }
+    cout << endl;
+    cout << "bypassindex: " << bypassindex << endl;
+    cout << "readindex: " << readindex << endl;
+    cout << "writeindex: " << writeindex << endl;
+    cout << "destinationregister: " << destinationregister << endl;
+    cout << "sourceregister1: " << sourceregister1 << endl;
+    cout << "sourceregister2: " << sourceregister2 << endl;
+    cout << "stagenames: ";
+    for (int i = 0; i < (int)stagenames.size(); i++) {
+        cout << stagenames[i] << " ";
+    }
+    cout << endl;
+    cout << "opcode: " << opcode << endl;
+    cout << "value: " << value << endl;
+    cout << "constant: " << constant << endl;
+}
 };
-
-//struct Command* new_Command(bool in1, int in2, vector<int> in3, vector<int> in4, vector<int> in5, vector<string> in6, string in7, int in8, int in9);
-
-void print_command(Command* in1);
 
 struct Registerfile{
     int size;
@@ -62,11 +84,24 @@ struct Registerfile{
         values.resize(size);
         values = temp3;
     }
+
+    struct vector<int> copy_vector(vector<int> in1) {
+    struct vector<int> newvector(in1.size());
+    for (int i = 0; i < (int)in1.size(); i++) {
+        newvector[i] = in1[i];
+    }
+    return newvector;
+    }
+
+    struct Registerfile* copy_file() {
+    struct Registerfile* newregisterfile = new Registerfile(size);
+    newregisterfile->size = size;
+    newregisterfile->updatetime = copy_vector(updatetime);
+    newregisterfile->intermediateupdatetime = copy_vector(intermediateupdatetime);
+    newregisterfile->values = copy_vector(values);
+    return newregisterfile;
+    }
 };
-
-// struct Registerfile* new_Registerfile(int in1);
-
-struct Registerfile* copy_file(Registerfile* in1);
 
 struct Runtimedata{
     Command* command;
@@ -88,11 +123,15 @@ struct Runtimedata{
         }
         stages = temp1;
     }
+
+    void print_runtime() {
+    for (int i = 0; i < (int)stagenames.size(); i++) {
+        cout << stagenames[i] << " " << stages[i][0] << " " << stages[i][1] << endl;
+    }
+    cout << endl;
+    }
+
 };
-
-struct vector<int> copy_vector(vector<int> in1);
-
-// struct Runtimedata* new_Runtimedata(Command* in1, int in2, int in3);
 
 struct Pipeline{
     int numberofstages;
@@ -128,20 +167,116 @@ struct Pipeline{
         history.resize(0);
         pseudoruntimelist.resize(0);
     }
+
+    struct Runtimedata* run_command(Command* in1){
+    vector<int> v = {in1->destinationregister,in1->sourceregister1,in1->sourceregister2};
+    vector<int> v1 = {in1->bypassindex,in1->readindex,in1->writeindex};
+    struct Command* command = new Command(false,in1->intermediatelatchlength,in1->stagelengths,v1,v,in1->stagenames,in1->opcode,in1->value,in1->constant);
+    if (in1->intermediatelatchesactive){
+        for(int i=0;i<(int)command->stagelengths.size()-1;i++){
+            command->stagelengths[i]+=command->intermediatelatchlength;
+        }
+    }
+    if (symmetryactive){
+        vector<int> temp1(command->numberofstages,*max_element(command->stagelengths.begin(),command->stagelengths.end()));
+        command->stagelengths= temp1;
+    }
+    struct Runtimedata* runtime = new Runtimedata(command,stageemptytime[0],command->numberofstages);
+    runtime->stagenames[0]=command->stagenames[0];
+    runtime->stages[0]={pseudostageemptytime[stagemap[command->stagenames[0]]],-1};
+    for (int j=0;j<command->numberofstages-1;j++){
+
+        int endtime = runtime->stages[j][0]+command->stagelengths[j];
+        if (endtime<pseudostageemptytime[stagemap[command->stagenames[j+1]]]){
+            endtime= pseudostageemptytime[stagemap[command->stagenames[j+1]]];
+
+        }
+        if (j+1==command->bypassindex){
+            if (bypassactive){
+                if (command->sourceregister1!=-1){
+                    if(pseudoregisterfile->intermediateupdatetime[command->sourceregister1]>endtime){
+                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister1];
+                    }
+                }
+                if (command->sourceregister2!=-1){
+                    if(pseudoregisterfile->intermediateupdatetime[command->sourceregister2]>endtime){
+                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister2];
+                    }
+                }
+            }
+            else{
+                if (command->sourceregister1 != -1){
+                    if (pseudoregisterfile->updatetime[command->sourceregister1] > endtime){
+                        endtime = pseudoregisterfile->updatetime[command->sourceregister1];
+                    }
+                }
+                if (command->sourceregister2 != -1){
+                    if (pseudoregisterfile->updatetime[command->sourceregister2] > endtime){
+                        endtime = pseudoregisterfile->updatetime[command->sourceregister2];
+                    }
+                }              
+            }
+        }
+        if(command->destinationregister!=-1){
+            if(j==command->readindex){
+                pseudoregisterfile->intermediateupdatetime[command->destinationregister]=endtime;}
+                // new next two lines
+            if (j==command->writeindex){
+                pseudoregisterfile->updatetime[command->destinationregister]=endtime;
+            }
+        }
+        runtime->stages[j][1]=endtime;
+        runtime->stagenames[j+1] =command->stagenames[j+1];
+        runtime->stages[j+1] = {endtime,-1};
+        pseudostageemptytime[stagemap[command->stagenames[j]]]=endtime;
+    }
+    pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]]=runtime->stages[command->numberofstages-1][0]+command->stagelengths[command->numberofstages-1];
+    // next two lines are new
+    if(command->destinationregister!=-1){
+        if(command->writeindex==command->numberofstages-1){
+            pseudoregisterfile->updatetime[command->destinationregister]=pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]];
+        }
+        if(command->readindex==command->numberofstages-1){
+            pseudoregisterfile->intermediateupdatetime[command->destinationregister]=pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]];
+        }
+        registerfile->values[command->destinationregister]=command->value;
+    }
+    runtime->stages[command->numberofstages-1][1]=pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]];
+    pseudoruntimelist.push_back(runtime);
+    return runtime;
+    }
+
+    void save() {
+    history.insert(history.end(), pseudoruntimelist.begin(), pseudoruntimelist.end());
+    if(pseudoruntimelist.size() > 0){
+        pseudoruntimelist.clear();
+    }
+    registerfile = pseudoregisterfile->copy_file();
+    stageemptytime = pseudoregisterfile->copy_vector(pseudostageemptytime);
+    }
+
+    void restore(Pipeline* pipeline ) {
+        if(pseudoruntimelist.size() > 0){
+            pseudoruntimelist.clear();
+        }
+        pseudoregisterfile = registerfile->copy_file();
+        pseudostageemptytime = registerfile->copy_vector(stageemptytime);
+    }
+
+    void insert_halt(Command* command, Pipeline* pipeline) {
+        stageemptytime[0] = history.back()->stages[command->readindex][2];
+        if(pseudoruntimelist.size() > 0){
+            pseudoruntimelist.clear();
+        }
+        pseudoregisterfile = registerfile->copy_file();
+        pseudostageemptytime = registerfile->copy_vector(stageemptytime);
+    }
+
+    void print_pipeline() {
+        for (int i = 0; i < (int)history.size(); i++) {
+            history[i]->print_runtime();
+        }
+    }
 };
-
-// struct Pipeline* new_Pipeline(int in1, bool in2, bool in3, int in4, int in5, vector<string> in6);
-
-struct Runtimedata* run_command(Pipeline* pipeline ,Command* in1);
-
-void save(Pipeline* pipeline );
-
-void restore(Pipeline* pipeline );
-
-void insert_halt( Command* command, Pipeline* pipeline );
-
-void print_runtime(Runtimedata* runtime);
-
-void print_pipeline(Pipeline* pipeline);
 
 #endif
