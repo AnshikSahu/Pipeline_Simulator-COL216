@@ -1,12 +1,5 @@
-/**
- * @file MIPS_Processor.hpp
- * @author Mallika Prabhakar and Sayam Sethi
- * 
- */
-
 #ifndef __SIMULATOR_HPP__
 #define __SIMULATOR_HPP__
-
 #include <unordered_map>
 #include <string>
 #include <functional>
@@ -16,7 +9,9 @@
 #include <iostream>
 #include <boost/tokenizer.hpp>
 #include "parser.hpp"
-
+#include "requirements.hpp"
+#include "pipeline.hpp"
+using namespace std;
 struct Simulator
 {	
 	struct Parser* parser;

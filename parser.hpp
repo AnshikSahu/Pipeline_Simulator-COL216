@@ -11,6 +11,8 @@
 #include <iostream>
 #include <boost/tokenizer.hpp>
 #include "requirements.hpp"
+#include "pipeline.hpp"
+using namespace std;
 struct Parser
 {
     vector< struct Command* > parametric_commands;
