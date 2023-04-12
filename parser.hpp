@@ -112,7 +112,7 @@ struct Parser
 		// strip until before the comment begins
 		line = line.substr(0, line.find('#'));
 		std::vector<std::string> command;
-		boost::tokenizer<boost::char_separator<char>> tokens(line, boost::char_separator<char>(", \t"));
+		boost::tokenizer<boost::char_separator<char>> tokens(line, boost::char_separator<char>(", \t()"));
 		for (auto &s : tokens)
 			command.push_back(s);
 		// empty line or a comment only line
@@ -175,6 +175,5 @@ struct Parser
 			parseCommand(line);
 		file.close();
 	}
-
 };
 #endif

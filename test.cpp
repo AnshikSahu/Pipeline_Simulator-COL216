@@ -5,7 +5,7 @@ using namespace std;
 
 int main(){
     ifstream file("sample.asm");
-    struct MIPS_Architecture* parser = new MIPS_Architecture(file,1);
+    struct Parser* parser = new Parser(file,1);
     vector<struct Command*> commands = parser->parametric_commands;
     for(int i = 0; i < (int)commands.size(); i++){
         commands[i]->print_command();
