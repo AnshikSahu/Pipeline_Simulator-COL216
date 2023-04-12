@@ -44,7 +44,7 @@ struct Simulator
 		commandCount=parser->commandCount;
 		switch(question){
 			case 1:
-				pipeline=new Pipeline(5,false,true,32,0,{"IF","ID","EX","MEM","WB"});
+				pipeline=new Pipeline(5,false,true,32,0,{"IF","ID","EX","ME","WB"});
 				break;
 			case 2:
 				break;

@@ -45,9 +45,9 @@ struct Parser
         switch (question)
         {
         case 1:
-            stage_names={{"add", { "IF", "ID", "EX", "MEM", "WB" }}, {"sub", { "IF", "ID", "EX", "MEM", "WB" }}, {"mul", { "IF", "ID", "EX", "MEM", "WB" }}, {"beq", { "IF", "ID", "EX", "MEM", "WB" }}, {"bne", { "IF", "ID", "EX", "MEM", "WB" }}, {"slt", { "IF", "ID", "EX", "MEM", "WB" }}, {"j", { "IF", "ID", "EX", "MEM", "WB" }}, {"lw", { "IF", "ID", "EX", "MEM", "WB" }}, {"lw_offset", { "IF", "ID", "EX", "MEM", "WB" }}, {"sw", { "IF", "ID", "EX", "MEM", "WB" }}, {"sw_offset", { "IF", "ID", "EX", "MEM", "WB" }}, {"addi", { "IF", "ID", "EX", "MEM", "WB" }}};
+            stage_names={{"add", { "IF", "ID", "EX", "ME", "WB" }}, {"sub", { "IF", "ID", "EX", "ME", "WB" }}, {"mul", { "IF", "ID", "EX", "ME", "WB" }}, {"beq", { "IF", "ID", "EX", "ME", "WB" }}, {"bne", { "IF", "ID", "EX", "ME", "WB" }}, {"slt", { "IF", "ID", "EX", "ME", "WB" }}, {"j", { "IF", "ID", "EX", "ME", "WB" }}, {"lw", { "IF", "ID", "EX", "ME", "WB" }}, {"lw_offset", { "IF", "ID", "EX", "ME", "WB" }}, {"sw", { "IF", "ID", "EX", "ME", "WB" }}, {"sw_offset", { "IF", "ID", "EX", "ME", "WB" }}, {"addi", { "IF", "ID", "EX", "ME", "WB" }}};
             parametrs={{1,20},{70,100,150,200,120}};
-            indices = {{"add", {2,2,4}}, {"sub", {2,2,4}}, {"mul", {2,2,4}}, {"beq", {2,2,-1}}, {"bne", {2,2,-1}}, {"slt", {2,2,4}}, {"j", {-1,1,-1}}, {"lw", {3,3,4}}, {"lw_offset", {2,3,4}}, {"sw", {3,3,-1}}, {"sw_offset", {2,3,-1}}, {"addi", {2,2,4}}};
+            indices = {{"add", {2,2,2,4}}, {"sub", {2,2,2,4}}, {"mul", {2,2,2,4}}, {"beq", {2,2,2,-1}}, {"bne", {2,2,2,-1}}, {"slt", {2,2,2,4}}, {"j", {-1,-1,1,-1}}, {"lw", {2,-1,3,4}}, {"sw", {3,2,3,-1}}, {"addi", {2,-1,2,4}}};
             break;
         case 2:
             break;
@@ -170,12 +170,19 @@ struct Parser
         struct Command* parametric= define(command);
         parametric_commands.push_back(parametric);
 	}
+	void print_commands()
+	{
+		for(int i=0;i<(int)commands.size();i++){
+			parametric_commands[i]->print_command();
+		}
+	}
 	void constructCommands(std::ifstream &file)
 	{
 		std::string line;
 		while (getline(file, line))
 			parseCommand(line);
 		file.close();
+		print_commands();
 	}
 };
 #endif

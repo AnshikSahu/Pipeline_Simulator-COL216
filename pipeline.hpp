@@ -44,7 +44,7 @@ struct Pipeline{
     }
     struct Runtimedata* run_command(Command* in1){
     vector<int> v = {in1->destinationregister,in1->sourceregister1,in1->sourceregister2};
-    vector<int> v1 = {in1->bypassindex,in1->readindex,in1->writeindex};
+    vector<int> v1 = {in1->bypassindex1,in1->bypassindex2,in1->readindex,in1->writeindex};
     struct Command* command = new Command(false,in1->intermediatelatchlength,in1->stagelengths,v1,v,in1->stagenames,in1->opcode,in1->value,in1->constant);
     if (in1->intermediatelatchesactive){
         for(int i=0;i<(int)command->stagelengths.size()-1;i++){
@@ -59,24 +59,16 @@ struct Pipeline{
     runtime->stagenames[0]=command->stagenames[0];
     runtime->stages[0]={pseudostageemptytime[stagemap[command->stagenames[0]]],-1};
     for (int j=0;j<command->numberofstages-1;j++){
-
         int endtime = runtime->stages[j][0]+command->stagelengths[j];
         if (endtime<pseudostageemptytime[stagemap[command->stagenames[j+1]]]){
             endtime= pseudostageemptytime[stagemap[command->stagenames[j+1]]];
 
         }
-        cout << "Bypass" << command->bypassindex << endl;
-        if (j+1==command->bypassindex){
-            cout << "here" << endl;
+        if (j+1==command->bypassindex1){
             if (bypassactive){
                 if (command->sourceregister1!=-1){
                     if(pseudoregisterfile->intermediateupdatetime[command->sourceregister1]>endtime){
                         endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister1];
-                    }
-                }
-                if (command->sourceregister2!=-1){
-                    if(pseudoregisterfile->intermediateupdatetime[command->sourceregister2]>endtime){
-                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister2];
                     }
                 }
             }
@@ -85,14 +77,26 @@ struct Pipeline{
                     if (pseudoregisterfile->updatetime[command->sourceregister1] > endtime){
                         endtime = pseudoregisterfile->updatetime[command->sourceregister1];
                     }
+                }           
+            }
+        }
+        if(j+1==command->bypassindex2){
+            if(bypassactive){
+                if (command->sourceregister2!=-1){
+                    if(pseudoregisterfile->intermediateupdatetime[command->sourceregister2]>endtime){
+                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister2];
+                    }
                 }
+            }
+            else{
                 if (command->sourceregister2 != -1){
                     if (pseudoregisterfile->updatetime[command->sourceregister2] > endtime){
                         endtime = pseudoregisterfile->updatetime[command->sourceregister2];
                     }
-                }              
+                }   
             }
         }
+
         if(command->destinationregister!=-1){
             if(j==command->readindex){
                 pseudoregisterfile->intermediateupdatetime[command->destinationregister]=endtime;}

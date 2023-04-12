@@ -13,7 +13,8 @@ struct Command{
     int intermediatelatchlength;
     int numberofstages;
     vector<int> stagelengths;
-    int bypassindex;
+    int bypassindex1;
+    int bypassindex2;
     int readindex;
     int writeindex;
     int destinationregister;
@@ -28,9 +29,10 @@ struct Command{
         intermediatelatchlength = in2;
         numberofstages = (int)in3.size();
         stagelengths = in3;
-        bypassindex = in4[0];
-        readindex = in4[1];
-        writeindex = in4[2];
+        bypassindex1 = in4[0];
+        bypassindex2 = in4[1];
+        readindex = in4[2];
+        writeindex = in4[3];
         destinationregister = in5[0];
         sourceregister1 = in5[1];
         sourceregister2 = in5[2];
@@ -48,7 +50,8 @@ struct Command{
         cout << stagelengths[i] << " ";
     }
     cout << endl;
-    cout << "bypassindex: " << bypassindex << endl;
+    cout << "bypassindex1: " << bypassindex1 << endl;
+    cout << "bypassindex2: " << bypassindex2 << endl;
     cout << "readindex: " << readindex << endl;
     cout << "writeindex: " << writeindex << endl;
     cout << "destinationregister: " << destinationregister << endl;
