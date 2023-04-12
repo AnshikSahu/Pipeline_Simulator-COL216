@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <iostream>
 using namespace std;
-
 struct Command{
     public:
     bool intermediatelatchesactive;
@@ -24,7 +23,6 @@ struct Command{
     string opcode;
     int value;
     int constant;
-
     Command(bool in1, int in2, vector<int> in3, vector<int> in4, vector<int> in5, vector<string> in6, string in7, int in8, int in9) {
         intermediatelatchesactive = in1;
         intermediatelatchlength = in2;
@@ -41,7 +39,6 @@ struct Command{
         value = in8;
         constant = in9;
     }
-
     void print_command() {
     cout << "intermediatelatchesactive: " << intermediatelatchesactive << endl;
     cout << "intermediatelatchlength: " << intermediatelatchlength << endl;
@@ -67,13 +64,11 @@ struct Command{
     cout << "constant: " << constant << endl;
 }
 };
-
 struct Registerfile{
     int size;
     vector<int> updatetime;
     vector<int> intermediateupdatetime;
     vector<int> values;
-
     Registerfile(int in1){
         size = in1;
         vector<int> temp1(in1, 0),temp2(in1,0),temp3(in1,0);
@@ -84,7 +79,6 @@ struct Registerfile{
         values.resize(size);
         values = temp3;
     }
-
     struct vector<int> copy_vector(vector<int> in1) {
     struct vector<int> newvector(in1.size());
     for (int i = 0; i < (int)in1.size(); i++) {
@@ -92,7 +86,6 @@ struct Registerfile{
     }
     return newvector;
     }
-
     struct Registerfile* copy_file() {
     struct Registerfile* newregisterfile = new Registerfile(size);
     newregisterfile->size = size;
@@ -102,7 +95,6 @@ struct Registerfile{
     return newregisterfile;
     }
 };
-
 struct Runtimedata{
     Command* command;
     int starttime;
@@ -123,16 +115,13 @@ struct Runtimedata{
         }
         stages = temp1;
     }
-
     void print_runtime() {
     for (int i = 0; i < (int)stagenames.size(); i++) {
         cout << stagenames[i] << " " << stages[i][0] << " " << stages[i][1] << endl;
     }
     cout << endl;
     }
-
 };
-
 struct Pipeline{
     int numberofstages;
     bool bypassactive;
@@ -167,7 +156,6 @@ struct Pipeline{
         history.resize(0);
         pseudoruntimelist.resize(0);
     }
-
     struct Runtimedata* run_command(Command* in1){
     vector<int> v = {in1->destinationregister,in1->sourceregister1,in1->sourceregister2};
     vector<int> v1 = {in1->bypassindex,in1->readindex,in1->writeindex};
@@ -245,7 +233,6 @@ struct Pipeline{
     pseudoruntimelist.push_back(runtime);
     return runtime;
     }
-
     void save() {
     history.insert(history.end(), pseudoruntimelist.begin(), pseudoruntimelist.end());
     if(pseudoruntimelist.size() > 0){
@@ -254,7 +241,6 @@ struct Pipeline{
     registerfile = pseudoregisterfile->copy_file();
     stageemptytime = pseudoregisterfile->copy_vector(pseudostageemptytime);
     }
-
     void restore(Pipeline* pipeline ) {
         if(pseudoruntimelist.size() > 0){
             pseudoruntimelist.clear();
@@ -262,7 +248,6 @@ struct Pipeline{
         pseudoregisterfile = registerfile->copy_file();
         pseudostageemptytime = registerfile->copy_vector(stageemptytime);
     }
-
     void insert_halt(Command* command, Pipeline* pipeline) {
         stageemptytime[0] = history.back()->stages[command->readindex][2];
         if(pseudoruntimelist.size() > 0){
@@ -271,12 +256,10 @@ struct Pipeline{
         pseudoregisterfile = registerfile->copy_file();
         pseudostageemptytime = registerfile->copy_vector(stageemptytime);
     }
-
     void print_pipeline() {
         for (int i = 0; i < (int)history.size(); i++) {
             history[i]->print_runtime();
         }
     }
 };
-
 #endif

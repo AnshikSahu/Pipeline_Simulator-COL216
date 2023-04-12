@@ -1,6 +1,5 @@
 #ifndef __parser__
 #define __parser__
-
 #include <unordered_map>
 #include <string>
 #include <functional>
@@ -12,7 +11,6 @@
 #include <iostream>
 #include <boost/tokenizer.hpp>
 #include "requirements.hpp"
-
 struct MIPS_Architecture
 {
     vector< struct Command* > parametric_commands;
@@ -35,8 +33,6 @@ struct MIPS_Architecture
 		SYNTAX_ERROR,
 		MEMORY_ERROR
 	};
-
-	// constructor to initialise the instruction set
 	MIPS_Architecture(std::ifstream &file, int question)
 	{
 		for (int i = 0; i < 32; ++i)
@@ -57,7 +53,6 @@ struct MIPS_Architecture
 		registerMap["$sp"] = 29;
 		registerMap["$s8"] = 30;
 		registerMap["$ra"] = 31;
-
         switch (question)
         {
         case 1:
@@ -78,7 +73,6 @@ struct MIPS_Architecture
 		constructCommands(file);
 		commandCount.assign(commands.size(), 0);
 	}
-
     struct Command* define(std::vector<string> command){
         bool in1=parametrs[0][0]==1;
         int in2=parametrs[0][1];
@@ -126,8 +120,6 @@ struct MIPS_Architecture
         struct Command* cmd = new Command(in1,in2,in3,in4,in5,in6,in7,0,in9);
         return cmd;
     }
-
-	// parse the command assuming correctly formatted MIPS instruction (or label)
 	void parseCommand(std::string line)
 	{
 		// strip until before the comment begins
@@ -189,8 +181,6 @@ struct MIPS_Architecture
         struct Command* parametric= define(command);
         parametric_commands.push_back(parametric);
 	}
-
-	// construct the commands vector from the input file
 	void constructCommands(std::ifstream &file)
 	{
 		std::string line;
@@ -200,5 +190,4 @@ struct MIPS_Architecture
 	}
 
 };
-
 #endif
