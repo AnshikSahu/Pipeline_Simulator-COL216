@@ -47,6 +47,7 @@ struct Simulator
 				pipeline=new Pipeline(5,false,true,32,0,{"IF","ID","EX","ME","WB"});
 				break;
 			case 2:
+				pipeline=new Pipeline(5,true,true,32,0,{"IF","ID","EX","ME","WB"});
 				break;
 			case 3:
 				break;
