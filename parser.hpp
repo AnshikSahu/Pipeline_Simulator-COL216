@@ -47,7 +47,7 @@ struct Parser
         case 1:
             stage_names={{"add", { "IF", "ID", "EX", "MEM", "WB" }}, {"sub", { "IF", "ID", "EX", "MEM", "WB" }}, {"mul", { "IF", "ID", "EX", "MEM", "WB" }}, {"beq", { "IF", "ID", "EX", "MEM", "WB" }}, {"bne", { "IF", "ID", "EX", "MEM", "WB" }}, {"slt", { "IF", "ID", "EX", "MEM", "WB" }}, {"j", { "IF", "ID", "EX", "MEM", "WB" }}, {"lw", { "IF", "ID", "EX", "MEM", "WB" }}, {"lw_offset", { "IF", "ID", "EX", "MEM", "WB" }}, {"sw", { "IF", "ID", "EX", "MEM", "WB" }}, {"sw_offset", { "IF", "ID", "EX", "MEM", "WB" }}, {"addi", { "IF", "ID", "EX", "MEM", "WB" }}};
             parametrs={{1,20},{70,100,150,200,120}};
-            indices = {{"add", {2,2,4}}, {"sub", {2,2,4}}, {"mul", {2,2,4}}, {"beq", {2,2,-1}}, {"bne", {2,2,-1}}, {"slt", {2,2,4}}, {"j", {-1,-1,-1}}, {"lw", {3,3,4}}, {"lw_offset", {2,3,4}}, {"sw", {3,3,-1}}, {"sw_offset", {2,3,-1}}, {"addi", {2,2,4}}};
+            indices = {{"add", {2,2,4}}, {"sub", {2,2,4}}, {"mul", {2,2,4}}, {"beq", {2,2,-1}}, {"bne", {2,2,-1}}, {"slt", {2,2,4}}, {"j", {-1,1,-1}}, {"lw", {3,3,4}}, {"lw_offset", {2,3,4}}, {"sw", {3,3,-1}}, {"sw_offset", {2,3,-1}}, {"addi", {2,2,4}}};
             break;
         case 2:
             break;

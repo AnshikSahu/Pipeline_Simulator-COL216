@@ -118,6 +118,7 @@ struct Runtimedata{
         stages = temp1;
     }
     void print_runtime() {
+    cout << command->opcode << endl;
     for (int i = 0; i < (int)stagenames.size(); i++) {
         cout << stagenames[i] << " " << stages[i][0] << " " << stages[i][1] << endl;
     }

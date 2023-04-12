@@ -65,7 +65,9 @@ struct Pipeline{
             endtime= pseudostageemptytime[stagemap[command->stagenames[j+1]]];
 
         }
+        cout << "Bypass" << command->bypassindex << endl;
         if (j+1==command->bypassindex){
+            cout << "here" << endl;
             if (bypassactive){
                 if (command->sourceregister1!=-1){
                     if(pseudoregisterfile->intermediateupdatetime[command->sourceregister1]>endtime){
@@ -116,6 +118,7 @@ struct Pipeline{
         registerfile->values[command->destinationregister]=command->value;
     }
     runtime->stages[command->numberofstages-1][1]=pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]];
+    registerfile->values[command->destinationregister]=command->value;
     pseudoruntimelist.push_back(runtime);
     return runtime;
     }
@@ -127,15 +130,16 @@ struct Pipeline{
     registerfile = pseudoregisterfile->copy_file();
     stageemptytime = pseudoregisterfile->copy_vector(pseudostageemptytime);
     }
-    void restore(Pipeline* pipeline ) {
+    void restore() {
         if(pseudoruntimelist.size() > 0){
             pseudoruntimelist.clear();
         }
         pseudoregisterfile = registerfile->copy_file();
         pseudostageemptytime = registerfile->copy_vector(stageemptytime);
     }
-    void insert_halt(Command* command, Pipeline* pipeline) {
-        stageemptytime[0] = history.back()->stages[command->readindex][2];
+    void insert_halt(Command* com) {
+        stageemptytime[0] = history[(int)history.size()-1]->stages[com->readindex][1];
+        pseudostageemptytime[0] = history[(int)history.size()-1]->stages[com->readindex][1];
         if(pseudoruntimelist.size() > 0){
             pseudoruntimelist.clear();
         }

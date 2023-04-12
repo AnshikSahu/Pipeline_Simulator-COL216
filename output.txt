@@ -1,0 +1,55 @@
+g++ requirements.hpp pipeline.hpp parser.hpp simulator.hpp sample.cpp -o sample
+./sample sample.asm
+Bypass2
+Bypass2
+here
+Bypass2
+Bypass2
+0 0 0 0 0 0 0 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 Bypass2
+Bypass2
+here
+Bypass2
+Bypass2
+0 0 0 0 0 0 0 0 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 Bypass2
+Bypass2
+here
+Bypass2
+Bypass2
+0 0 0 0 0 0 0 0 10 0 0 0 0 0 0 0 0 320 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 Bypass2
+Bypass2
+here
+Bypass2
+Bypass2
+0 0 0 0 0 0 0 0 10 0 0 0 0 0 0 0 0 320 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 
+addi
+IF 0 220
+ID 220 440
+EX 440 660
+MEM 660 880
+WB 880 1100
+
+add
+IF 220 440
+ID 440 660
+EX 660 880
+MEM 880 1100
+WB 1100 1320
+
+addi
+IF 440 660
+ID 660 880
+EX 880 1100
+MEM 1100 1320
+WB 1320 1540
+
+beq
+IF 660 880
+ID 880 1320
+EX 1320 1540
+MEM 1540 1760
+WB 1760 1980
+

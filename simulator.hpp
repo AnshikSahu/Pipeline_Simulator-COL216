@@ -15,6 +15,7 @@ using namespace std;
 struct Simulator
 {	
 	struct Parser* parser;
+	struct Pipeline* pipeline;
 	int registers[32] = {0}, PCcurr = 0, PCnext;
 	std::unordered_map<std::string, std::function<int(Simulator &, std::string, std::string, std::string)>> instructions;
 	std::unordered_map<std::string, int> registerMap, address;
@@ -41,6 +42,20 @@ struct Simulator
 		registerMap = parser->registerMap;
 		address = parser->address;
 		commandCount=parser->commandCount;
+		switch(question){
+			case 1:
+				pipeline=new Pipeline(5,false,true,32,0,{"IF","ID","EX","MEM","WB"});
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			case 4:
+				break;
+			default:
+				cerr << "Invalid question number" << endl;
+				break;
+		}
 	}
 	// perform add operation
 	int add(std::string r1, std::string r2, std::string r3)
@@ -258,10 +273,11 @@ struct Simulator
 				std::cerr << s << ' ';
 			std::cerr << '\n';
 		}
+		pipeline->print_pipeline();
 	}
 
 	// execute the commands sequentially (no pipelining)
-	void executeCommandsUnpipelined()
+	void executeCommands()
 	{
 		if (commands.size() >= MAX / 4)
 		{
@@ -269,27 +285,33 @@ struct Simulator
 			return;
 		}
 
-		int clockCycles = 0;
+		int clockCyclesUnpipelined = 0;
 		while (PCcurr < commands.size())
 		{
-			++clockCycles;
+			++clockCyclesUnpipelined;
 			std::vector<std::string> &command = commands[PCcurr];
 			if (instructions.find(command[0]) == instructions.end())
 			{
-				handleExit(SYNTAX_ERROR, clockCycles);
+				handleExit(SYNTAX_ERROR, clockCyclesUnpipelined);
 				return;
 			}
 			exit_code ret = (exit_code) instructions[command[0]](*this, command[1], command[2], command[3]);
 			if (ret != SUCCESS)
 			{
-				handleExit(ret, clockCycles);
+				handleExit(ret, clockCyclesUnpipelined);
 				return;
 			}
 			++commandCount[PCcurr];
+			parser->parametric_commands[PCcurr]->value=registers[registerMap[command[1]]];
+			pipeline->run_command(parser->parametric_commands[PCcurr]);
+			pipeline->save();
+			if(command[0]=="beq" || command[0]=="bne" || command[0]=="j"){
+				pipeline->insert_halt(parser->parametric_commands[PCcurr]);
+			}
 			PCcurr = PCnext;
-			printRegistersAndMemoryDelta(clockCycles);
+			printRegistersAndMemoryDelta(clockCyclesUnpipelined);
 		}
-		handleExit(SUCCESS, clockCycles);
+		handleExit(SUCCESS, clockCyclesUnpipelined);
 	}
 
 	// print the register data in hexadecimal
