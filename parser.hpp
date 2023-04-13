@@ -55,6 +55,9 @@ struct Parser
             indices = {{"add", {2,2,2,4}}, {"sub", {2,2,2,4}}, {"mul", {2,2,2,4}}, {"beq", {2,2,2,-1}}, {"bne", {2,2,2,-1}}, {"slt", {2,2,2,4}}, {"j", {-1,-1,1,-1}}, {"lw", {2,-1,3,4}}, {"sw", {3,2,3,-1}}, {"addi", {2,-1,2,4}}};
             break;
         case 3:
+	    stage_names={{"add", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"sub",{ "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"mul", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"beq", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"bne", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"slt", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"j", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"lw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"lw_offset", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"sw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"sw_offset", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"addi", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}};
+            parametrs={{},{}};
+            indices = {{}};
             break;
         case 4:
             break;
