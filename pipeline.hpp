@@ -21,7 +21,7 @@ struct Pipeline{
     vector<Runtimedata*> history;
     int starttime;
     unordered_map<string, int> stagemap;
-
+    int cycle;
     Pipeline(int in1, bool in2, bool in3, int in4, int in5, vector<string> in6) {
         numberofstages = in1;
         bypassactive = in2;
@@ -41,6 +41,7 @@ struct Pipeline{
         }
         history.resize(0);
         pseudoruntimelist.resize(0);
+        cycle=-1;
     }
     struct Runtimedata* run_command(Command* in1){
     vector<int> v = {in1->destinationregister,in1->sourceregister1,in1->sourceregister2};
@@ -54,6 +55,14 @@ struct Pipeline{
     if (symmetryactive){
         vector<int> temp1(command->numberofstages,*max_element(command->stagelengths.begin(),command->stagelengths.end()));
         command->stagelengths= temp1;
+        if(cycle==-1){
+            cycle=temp1[0];
+        }
+        else{
+            if(cycle!=temp1[0]){
+                cycle=-2;
+            }
+        }
     }
     struct Runtimedata* runtime = new Runtimedata(command,stageemptytime[0],command->numberofstages);
     runtime->stagenames[0]=command->stagenames[0];
@@ -103,6 +112,7 @@ struct Pipeline{
                 // new next two lines
             if (j==command->writeindex){
                 pseudoregisterfile->updatetime[command->destinationregister]=endtime;
+                pseudoregisterfile->queue->enqueue(command->destinationregister,command->value,endtime);
             }
         }
         runtime->stages[j][1]=endtime;
@@ -115,6 +125,7 @@ struct Pipeline{
     if(command->destinationregister!=-1){
         if(command->writeindex==command->numberofstages-1){
             pseudoregisterfile->updatetime[command->destinationregister]=pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]];
+            pseudoregisterfile->queue->enqueue(command->destinationregister,command->value,pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]]);
         }
         if(command->readindex==command->numberofstages-1){
             pseudoregisterfile->intermediateupdatetime[command->destinationregister]=pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]];
@@ -153,6 +164,33 @@ struct Pipeline{
     void print_pipeline() {
         for (int i = 0; i < (int)history.size(); i++) {
             history[i]->print_runtime();
+        }
+    }
+    void print_table(){
+        if(cycle<0){
+            cerr << "Error: Pipeline is too asymetric to print a table" << endl;
+        }
+        for(int i=0; i<(int)history.size(); i++){
+            int x= history[i]->stages[0][0];
+            int j=x/cycle;
+            for(;j>0;j--){
+                std::cout<<"   ";
+            }
+            for(int k=0; k<(int)history[i]->stages.size(); k++){
+                string name=history[i]->stagenames[k];
+                if (name.length() >= 3) {
+                    name=name.substr(0, 3);
+                } else {
+                    name.append(3 - name.length(), ' ');
+                }
+                std::cout<<name<<"";
+                int y= history[i]->stages[k][1]-history[i]->stages[k][0]-cycle;
+                int l=y/cycle;
+                for(;l>0;l--){
+                    std::cout<<" * ";
+                }
+            }
+            std::cout<<""<<endl;
         }
     }
 };
