@@ -1,6 +1,13 @@
 g++ requirements.hpp pipeline.hpp parser.hpp simulator.hpp sample.cpp -o sample
 ./sample sample.asm
-intermediatelatchesactive: 1
+0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+1 1024 2
+0 4 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 4 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 4 3 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 intermediatelatchesactive: 1
 intermediatelatchlength: 20
 numberofstages: 5
 stagelengths: 70 100 150 200 120 
@@ -13,7 +20,7 @@ sourceregister1: 0
 sourceregister2: -1
 stagenames: IF ID EX ME WB 
 opcode: addi
-value: 0
+value: 2
 constant: 2
 intermediatelatchesactive: 1
 intermediatelatchlength: 20
@@ -28,7 +35,7 @@ sourceregister1: 0
 sourceregister2: -1
 stagenames: IF ID EX ME WB 
 opcode: addi
-value: 0
+value: 1
 constant: 1
 intermediatelatchesactive: 1
 intermediatelatchlength: 20
@@ -43,7 +50,7 @@ sourceregister1: 1
 sourceregister2: 2
 stagenames: IF ID EX ME WB 
 opcode: sw
-value: 0
+value: 2
 constant: 1023
 intermediatelatchesactive: 1
 intermediatelatchlength: 20
@@ -58,7 +65,7 @@ sourceregister1: 1
 sourceregister2: 1
 stagenames: IF ID EX ME WB 
 opcode: add
-value: 0
+value: 4
 constant: -1
 intermediatelatchesactive: 1
 intermediatelatchlength: 20
@@ -73,7 +80,7 @@ sourceregister1: 1
 sourceregister2: 2
 stagenames: IF ID EX ME WB 
 opcode: sub
-value: 0
+value: 3
 constant: -1
 intermediatelatchesactive: 1
 intermediatelatchlength: 20
@@ -88,61 +95,48 @@ sourceregister1: 2
 sourceregister2: -1
 stagenames: IF ID EX ME WB 
 opcode: lw
-value: 0
+value: 2
 constant: 1021
-0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-0 0 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-0 0 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-1 256 2
-0 4 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-0 0 4 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-0 0 4 3 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-0 
-addi
+
 IF 0 220
 ID 220 440
 EX 440 660
 ME 660 880
 WB 880 1100
 
-addi
 IF 220 440
 ID 440 660
 EX 660 880
 ME 880 1100
 WB 1100 1320
 
-sw
 IF 440 660
 ID 660 1320
 EX 1320 1540
 ME 1540 1760
 WB 1760 1980
 
-add
 IF 660 1320
 ID 1320 1540
 EX 1540 1760
 ME 1760 1980
 WB 1980 2200
 
-sub
 IF 1320 1540
 ID 1540 2200
 EX 2200 2420
 ME 2420 2640
 WB 2640 2860
 
-lw
 IF 1540 2200
 ID 2200 2860
 EX 2860 3080
 ME 3080 3300
 WB 3300 3520
 
-IFIDEXMEWB
-  IFIDEXMEWB
-    IFID* * EXMEWB
-      IF* * IDEXMEWB
-            IFID* * EXMEWB
-              IF* * ID* * EXMEWB
+IF ID EX ME WB 
+   IF ID EX ME WB 
+      IF ID  *  * EX ME WB 
+         IF  *  * ID EX ME WB 
+                  IF ID  *  * EX ME WB 
+                     IF  *  * ID  *  * EX ME WB 
