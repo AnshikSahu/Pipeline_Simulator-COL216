@@ -67,12 +67,102 @@ struct Command{
     cout << "constant: " << constant << endl;
 }
 };
-
+struct QueueNode {
+    int register_id;
+    int value;
+    int updatetime;
+    QueueNode* next;
+    QueueNode* prev;
+};
+struct RegisterfileQueue {
+    QueueNode* head;
+    QueueNode* tail;
+    QueueNode* pointer;
+    int size;
+    RegisterfileQueue() {
+        head = nullptr;
+        tail = nullptr;
+        pointer = nullptr;
+        size = 0;
+    }
+    void enqueue(int in1,int in2,int in3) {
+        QueueNode* newnode = new QueueNode;
+        newnode->register_id = in1;
+        newnode->value = in2;
+        newnode->updatetime = in3;
+        newnode->next = nullptr;
+        newnode->prev = nullptr;
+        if (head == nullptr) {
+            head = newnode;
+            pointer = newnode;
+            tail = newnode;
+        }
+        else {
+            tail->next = newnode;
+            newnode->prev = tail;
+            tail = newnode;
+        }
+    }
+    vector<int> dequeue() {
+        if (head == nullptr) {
+            return {-1,-1};}
+        QueueNode* oldhead = head;
+        vector<int> data= {oldhead->value,oldhead->register_id};
+        head = head->next;
+        if(pointer == oldhead){
+            pointer = head;
+        }
+        if (head == nullptr) {
+            tail = nullptr;
+        }
+        delete oldhead;
+        return data;
+        size--;
+    }
+    vector<int> peek() {
+        if (pointer == nullptr) {
+            return {-1,-1,-1};
+        }
+        vector<int> data = {pointer->value,pointer->register_id,pointer->updatetime};
+        return data;
+    }
+    void move_left() {
+        if (pointer == nullptr) {
+            return;
+        }
+        if (pointer->prev == nullptr) {
+            return;
+        }
+        pointer = pointer->prev;
+    }
+    void move_right() {
+        if (pointer == nullptr) {
+            return;
+        }
+        if (pointer->next == nullptr) {
+            return;
+        }
+        pointer = pointer->next;
+    }
+    bool is_empty() {
+        return head == nullptr;
+    }
+    struct RegisterfileQueue* copy_queue() {
+        struct RegisterfileQueue* newqueue = new RegisterfileQueue();
+        QueueNode* temp = head;
+        while (temp != nullptr) {
+            newqueue->enqueue(temp->register_id, temp->value, temp->updatetime);
+            temp = temp->next;
+        }
+        return newqueue;
+    }
+};
 struct Registerfile{
     int size;
     vector<int> updatetime;
     vector<int> intermediateupdatetime;
     vector<int> values;
+    struct RegisterfileQueue* queue;
     Registerfile(int in1){
         size = in1;
         vector<int> temp1(in1, 0),temp2(in1,0),temp3(in1,0);
@@ -82,30 +172,49 @@ struct Registerfile{
         intermediateupdatetime = temp2;
         values.resize(size);
         values = temp3;
+        queue = new RegisterfileQueue();
     }
     struct vector<int> copy_vector(vector<int> in1) {
-    struct vector<int> newvector(in1.size());
-    for (int i = 0; i < (int)in1.size(); i++) {
-        newvector[i] = in1[i];
-    }
-    return newvector;
+        struct vector<int> newvector(in1.size());
+        for (int i = 0; i < (int)in1.size(); i++) {
+            newvector[i] = in1[i];
+        }
+        return newvector;
     }
     struct Registerfile* copy_file() {
-    struct Registerfile* newregisterfile = new Registerfile(size);
-    newregisterfile->size = size;
-    newregisterfile->updatetime = copy_vector(updatetime);
-    newregisterfile->intermediateupdatetime = copy_vector(intermediateupdatetime);
-    newregisterfile->values = copy_vector(values);
-    return newregisterfile;
+        struct Registerfile* newregisterfile = new Registerfile(size);
+        newregisterfile->size = size;
+        newregisterfile->updatetime = copy_vector(updatetime);
+        newregisterfile->intermediateupdatetime = copy_vector(intermediateupdatetime);
+        newregisterfile->values = copy_vector(values);
+        newregisterfile->queue = queue->copy_queue();
+        return newregisterfile;
+    }
+    void make_update(int in1,int in2, int in3){
+        updatetime[in1] = in3;
+        values[in1] = in2;
+    }
+    struct Registerfile* state_at_time(int in1){
+        struct Registerfile* newregisterfile = new Registerfile(size);
+        vector<int> temp = queue->peek();
+        while(temp[0]!=-1){
+            if(temp[2]<=in1){
+                newregisterfile->make_update(temp[1],temp[2],temp[0]);
+                queue->move_right();
+                temp = queue->peek();
+            }
+            else{
+                break;
+            }
+        }
+        return newregisterfile;
     }
 };
-
 struct Runtimedata{
     Command* command;
     int starttime;
     vector<string> stagenames;
     vector<vector<int> > stages;
-
     Runtimedata(Command* in1, int in2, int in3) {
         command = in1;
         starttime = in2;
@@ -121,7 +230,6 @@ struct Runtimedata{
         stages = temp1;
     }
     void print_runtime() {
-    cout << command->opcode << endl;
     for (int i = 0; i < (int)stagenames.size(); i++) {
         cout << stagenames[i] << " " << stages[i][0] << " " << stages[i][1] << endl;
     }
