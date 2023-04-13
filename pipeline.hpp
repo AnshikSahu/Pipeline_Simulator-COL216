@@ -14,6 +14,8 @@ struct Pipeline{
     bool symmetryactive;
     vector<int> stageemptytime;
     vector<int> pseudostageemptytime;
+    vector<int> stagestarttime;
+    vector<int> pseudostagestarttime;
     int numberofregisters;
     struct Registerfile* registerfile;
     struct Registerfile* pseudoregisterfile;
@@ -35,6 +37,12 @@ struct Pipeline{
         pseudostageemptytime.resize(in1);
         vector<int> temp2(in1,0);
         pseudostageemptytime = temp2;
+        stagestarttime.resize(in1);
+        vector<int> temp3(in1,0);
+        stagestarttime = temp3;
+        pseudostagestarttime.resize(in1);
+        vector<int> temp4(in1,0);
+        pseudostagestarttime = temp4;
         starttime = in5;
         for (int i = 0; i < (int)in6.size(); i++) {
             stagemap[in6[i]] = i;
@@ -67,12 +75,9 @@ struct Pipeline{
     struct Runtimedata* runtime = new Runtimedata(command,stageemptytime[0],command->numberofstages);
     runtime->stagenames[0]=command->stagenames[0];
     runtime->stages[0]={pseudostageemptytime[stagemap[command->stagenames[0]]],-1};
+    pseudostagestarttime[stagemap[command->stagenames[0]]]=pseudostageemptytime[stagemap[command->stagenames[0]]];
     for (int j=0;j<command->numberofstages-1;j++){
         int endtime = runtime->stages[j][0]+command->stagelengths[j];
-        if (endtime<pseudostageemptytime[stagemap[command->stagenames[j+1]]]){
-            endtime= pseudostageemptytime[stagemap[command->stagenames[j+1]]];
-
-        }
         if (j+1==command->bypassindex1){
             if (bypassactive){
                 if (command->sourceregister1!=-1){
@@ -105,7 +110,9 @@ struct Pipeline{
                 }   
             }
         }
-
+        if (endtime<pseudostageemptytime[stagemap[command->stagenames[j+1]]] and endtime>pseudostagestarttime[stagemap[command->stagenames[j+1]]]){
+            endtime= pseudostageemptytime[stagemap[command->stagenames[j+1]]];
+        }
         if(command->destinationregister!=-1){
             if(j==command->readindex){
                 pseudoregisterfile->intermediateupdatetime[command->destinationregister]=endtime;}
@@ -119,9 +126,9 @@ struct Pipeline{
         runtime->stagenames[j+1] =command->stagenames[j+1];
         runtime->stages[j+1] = {endtime,-1};
         pseudostageemptytime[stagemap[command->stagenames[j]]]=endtime;
+        pseudostagestarttime[stagemap[command->stagenames[j+1]]]=endtime;
     }
     pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]]=runtime->stages[command->numberofstages-1][0]+command->stagelengths[command->numberofstages-1];
-    // next two lines are new
     if(command->destinationregister!=-1){
         if(command->writeindex==command->numberofstages-1){
             pseudoregisterfile->updatetime[command->destinationregister]=pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]];
@@ -170,25 +177,56 @@ struct Pipeline{
         if(cycle<0){
             cerr << "Error: Pipeline is too asymetric to print a table" << endl;
         }
+        vector<vector<int>> last=history[(int)history.size()-1]->stages;
+        int lastcycle=last[(int)last.size()-1][1];
+        int numcycles=lastcycle/cycle;
+        cout<<"   ||";
+        for (int i = 0; i < numcycles; i++) {
+            cout<<i<<"";
+            if(i<10){
+                cout<<"   ";
+            }
+            else if(i<100){
+                cout<<"  ";
+            }
+            else if(i<1000){
+                cout<<" ";
+            }
+            cout<<"|";
+        }
+        cout<<endl;
         for(int i=0; i<(int)history.size(); i++){
+            cout<<i<<"";
+            if(i<10){
+                cout<<"  ";
+            }
+            else if(i<100){
+                cout<<" ";
+            }
+            cout<<"||";
             int x= history[i]->stages[0][0];
             int j=x/cycle;
             for(;j>0;j--){
-                std::cout<<"   ";
+                std::cout<<"    |";
             }
             for(int k=0; k<(int)history[i]->stages.size(); k++){
                 string name=history[i]->stagenames[k];
-                if (name.length() >= 3) {
-                    name=name.substr(0, 3);
+                if (name.length() >= 4) {
+                    name=name.substr(0, 4);
                 } else {
-                    name.append(3 - name.length(), ' ');
+                    name.append(4 - name.length(), ' ');
                 }
-                std::cout<<name<<"";
+                std::cout<<name<<"|";
                 int y= history[i]->stages[k][1]-history[i]->stages[k][0]-cycle;
                 int l=y/cycle;
                 for(;l>0;l--){
-                    std::cout<<" * ";
+                    std::cout<<"  * |";
                 }
+            }
+            int z=lastcycle-history[i]->stages[(int)history[i]->stages.size()-1][1];
+            int m=z/cycle;
+            for(;m>0;m--){
+                std::cout<<"    |";
             }
             std::cout<<""<<endl;
         }

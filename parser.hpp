@@ -57,12 +57,12 @@ struct Parser
         case 3:
 	    stage_names={{"add", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"sub",{ "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"mul", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"beq", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"bne", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"slt", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"j", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"lw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"sw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"addi", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}};
             parametrs={{1,20},{35,35,33,33,33,150,100,100,120}};
-            indices = {{"add", {5,5,5,6}}, {"sub", {5,5,5,6}}, {"mul", {5,5,5,6}}, {"beq", {5,5,5,-1}}, {"bne", {5,5,5,-1}}, {"slt", {5,5,5,6}}, {"j", {-1,-1,2,-1}}, {"lw", {5,-1,7,8}}, {"sw", {6,5,-1,-1}}, {"addi", {5,-1,5,6}}};
+            indices = {{"add", {4,4,5,6}}, {"sub", {4,4,5,6}}, {"mul", {4,4,5,6}}, {"beq", {4,4,5,-1}}, {"bne", {4,4,5,-1}}, {"slt", {4,4,5,6}}, {"j", {-1,-1,2,-1}}, {"lw", {4,-1,7,8}}, {"sw", {6,4,-1,-1}}, {"addi", {4,-1,5,6}}};
             break;
         case 4:
 	    stage_names={{"add", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"sub",{ "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"mul", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"beq", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"bne", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"slt", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"j", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"lw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"sw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"addi", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}};
             parametrs={{1,20},{35,35,33,33,33,150,100,100,120}};
-            indices = {{"add", {5,5,5,6}}, {"sub", {5,5,5,6}}, {"mul", {5,5,5,6}}, {"beq", {5,5,5,-1}}, {"bne", {5,5,5,-1}}, {"slt", {5,5,5,6}}, {"j", {-1,-1,2,-1}}, {"lw", {5,-1,7,8}}, {"sw", {6,5,-1,-1}}, {"addi", {5,-1,5,6}}};
+            indices = {{"add", {4,4,5,6}}, {"sub", {4,4,5,6}}, {"mul", {4,4,5,6}}, {"beq", {4,4,5,-1}}, {"bne", {4,4,5,-1}}, {"slt", {4,4,5,6}}, {"j", {-1,-1,2,-1}}, {"lw", {4,-1,7,8}}, {"sw", {6,4,-1,-1}}, {"addi", {4,-1,5,6}}};
             break;
         default:
             std:: cerr << "Invalid question number" << std::endl;
@@ -74,7 +74,6 @@ struct Parser
     struct Command* define(std::vector<string> command){
         bool in1=parametrs[0][0]==1;
         int in2=parametrs[0][1];
-        vector<int> in3=parametrs[1];
         vector<int> in4=indices[command[0]];
         vector<int> in5;
         vector<string> command_type1={"add","sub","and","or","slt","mul"}, command_type2={"addi","andi","ori"};
@@ -114,6 +113,14 @@ struct Parser
 			std:: cerr <<"error in command type"<<std::endl;
 		}
         vector<string> in6=stage_names[command[0]];
+		vector<int> in3;
+		unordered_map<string, int> stagemap;
+		for (int i = 0; i < (int)in6.size(); i++) {
+            stagemap[in6[i]] = i;
+        }
+		for(int i=0;i<in6.size();i++){
+			in3.push_back(parametrs[1][stagemap[in6[i]]]);
+		}
         string in7=command[0];
         struct Command* cmd = new Command(in1,in2,in3,in4,in5,in6,in7,0,in9);
         return cmd;

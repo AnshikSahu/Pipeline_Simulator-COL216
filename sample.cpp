@@ -15,7 +15,6 @@ int main(int argc, char *argv[])
 		std::cerr << "File could not be opened. Terminating...\n";
 		return 0;
 	}
-	
 	mips->executeCommands();
 	mips->pipeline->print_table();
 	return 0;

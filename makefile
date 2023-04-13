@@ -7,4 +7,4 @@ clean:
 	rm sample
 
 run: sample
-	./sample $(arg1)
+	./sample sample.asm
