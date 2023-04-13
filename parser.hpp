@@ -185,7 +185,6 @@ struct Parser
 		while (getline(file, line))
 			parseCommand(line);
 		file.close();
-		print_commands();
 	}
 };
 #endif
