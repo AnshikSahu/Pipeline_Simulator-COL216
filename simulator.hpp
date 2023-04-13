@@ -50,10 +50,8 @@ struct Simulator
 				pipeline=new Pipeline(5,true,true,32,0,{"IF","ID","EX","ME","WB"});
 				break;
 			case 3:
-				pipeline=new Pipeline(9,false,true,32,0,{"IF1","IF2","ID1","ID2","RR","EX","MEM1","MEM2","WB"});
 				break;
 			case 4:
-				pipeline=new Pipeline(9,true,true,32,0,{"IF1","IF2","ID1","ID2","RR","EX","MEM1","MEM2","WB"});
 				break;
 			default:
 				cerr << "Invalid question number" << endl;
@@ -314,6 +312,7 @@ struct Simulator
 			PCcurr = PCnext;
 			printRegistersAndMemoryDelta(clockCyclesUnpipelined);
 		}
+		parser->print_commands();
 		handleExit(SUCCESS, clockCyclesUnpipelined);
 	}
 
@@ -325,7 +324,7 @@ struct Simulator
 		std::cout << '\n';
 		std::cout << memoryDelta.size() << ' ';
 		for (auto &p : memoryDelta)
-			std::cout << p.first << ' ' << p.second << '\n';
+			std::cout << (p.first)*4 << ' ' << p.second << '\n';
 		memoryDelta.clear();
 	}
 };
