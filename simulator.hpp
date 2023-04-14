@@ -11,9 +11,12 @@
 #include "parser.hpp"
 #include "requirements.hpp"
 #include "pipeline.hpp"
+
 using namespace std;
+
 struct Simulator
 {	
+
 	struct Parser* parser;
 	struct Pipeline* pipeline;
 	int registers[32] = {0}, PCcurr = 0, PCnext;
@@ -83,8 +86,9 @@ struct Simulator
 	// perform the binary operation
 	int op(std::string r1, std::string r2, std::string r3, std::function<int(int, int)> operation)
 	{
-		if (!checkRegisters({r1, r2, r3}) || registerMap[r1] == 0)
+		if (!checkRegisters({r1, r2, r3}) || registerMap[r1] == 0){
 			return 1;
+		}
 		registers[registerMap[r1]] = operation(registers[registerMap[r2]], registers[registerMap[r3]]);
 		PCnext = PCcurr + 1;
 		return 0;
@@ -104,20 +108,24 @@ struct Simulator
 	// implements beq and bne by taking the comparator
 	int bOP(std::string r1, std::string r2, std::string label, std::function<bool(int, int)> comp)
 	{
-		if (!checkLabel(label))
+		if (!checkLabel(label)){
 			return 4;
-		if (address.find(label) == address.end() || address[label] == -1)
+		}
+		if (address.find(label) == address.end() || address[label] == -1){
 			return 2;
-		if (!checkRegisters({r1, r2}))
+		}
+		if (!checkRegisters({r1, r2})){
 			return 1;
+		}
 		PCnext = comp(registers[registerMap[r1]], registers[registerMap[r2]]) ? address[label] : PCcurr + 1;
 		return 0;
 	}
 	// implements slt operation
 	int slt(std::string r1, std::string r2, std::string r3)
 	{
-		if (!checkRegisters({r1, r2, r3}) || registerMap[r1] == 0)
+		if (!checkRegisters({r1, r2, r3}) || registerMap[r1] == 0){
 			return 1;
+		}
 		registers[registerMap[r1]] = registers[registerMap[r2]] < registers[registerMap[r3]];
 		PCnext = PCcurr + 1;
 		return 0;
@@ -125,10 +133,12 @@ struct Simulator
 	// perform the jump operation
 	int j(std::string label, std::string unused1 = "", std::string unused2 = "")
 	{
-		if (!checkLabel(label))
+		if (!checkLabel(label)){
 			return 4;
-		if (address.find(label) == address.end() || address[label] == -1)
+		}
+		if (address.find(label) == address.end() || address[label] == -1){
 			return 2;
+		}
 		PCnext = address[label];
 		return 0;
 	}
@@ -142,11 +152,13 @@ struct Simulator
 		else{
 			location=in1+"("+in2+")";
 		}
-		if (!checkRegister(r) || registerMap[r] == 0)
+		if (!checkRegister(r) || registerMap[r] == 0){
 			return 1;
+		}
 		int address = locateAddress(location);
-		if (address < 0)
+		if (address < 0){
 			return abs(address);
+		}
 		registers[registerMap[r]] = data[address];
 		PCnext = PCcurr + 1;
 		return 0;
@@ -161,17 +173,21 @@ struct Simulator
 		else{
 			location=in1+"("+in2+")";
 		}
-		if (!checkRegister(r))
+		if (!checkRegister(r)){
 			return 1;
+		}
 		int address = locateAddress(location);
-		if (address < 0)
+		if (address < 0){
 			return abs(address);
-		if (data[address] != registers[registerMap[r]])
+		}
+		if (data[address] != registers[registerMap[r]]){
 			memoryDelta[address] = registers[registerMap[r]];
+		}
 		data[address] = registers[registerMap[r]];
 		PCnext = PCcurr + 1;
 		return 0;
 	}
+	
 	int locateAddress(std::string location)
 	{
 		if (location.back() == ')')
@@ -181,11 +197,13 @@ struct Simulator
 				int lparen = location.find('('), offset = stoi(lparen == 0 ? "0" : location.substr(0, lparen));
 				std::string reg = location.substr(lparen + 1);
 				reg.pop_back();
-				if (!checkRegister(reg))
+				if (!checkRegister(reg)){
 					return -3;
+				}
 				int address = registers[registerMap[reg]] + offset;
-				if (address % 4 || address < int(4 * commands.size()) || address >= MAX)
+				if (address % 4 || address < int(4 * commands.size()) || address >= MAX){
 					return -3;
+				}
 				return address / 4;
 			}
 			catch (std::exception &e)
@@ -196,8 +214,9 @@ struct Simulator
 		try
 		{
 			int address = stoi(location);
-			if (address % 4 || address < int(4 * commands.size()) || address >= MAX)
+			if (address % 4 || address < int(4 * commands.size()) || address >= MAX){
 				return -3;
+			}
 			return address / 4;
 		}
 		catch (std::exception &e)
@@ -208,8 +227,9 @@ struct Simulator
 	// perform add immediate operation
 	int addi(std::string r1, std::string r2, std::string num)
 	{
-		if (!checkRegisters({r1, r2}) || registerMap[r1] == 0)
+		if (!checkRegisters({r1, r2}) || registerMap[r1] == 0){
 			return 1;
+		}
 		try
 		{
 			registers[registerMap[r1]] = registers[registerMap[r2]] + stoi(num);
@@ -353,12 +373,14 @@ struct Simulator
 	// print the register data in hexadecimal
 	 void printRegistersAndMemoryDelta(int clockCycle,vector<int> reg,unordered_map<int, int> memDelta)
 	{
-		for (int i = 0; i < 32; ++i)
+		for (int i = 0; i < 32; ++i){
 			std::cout << reg[i] << ' ';
+		}
 		std::cout << endl;
 		std::cout << memDelta.size() << ' ';
-		for (auto &p : memDelta)
+		for (auto &p : memDelta){
 			std::cout << (p.first) << ' ' << p.second << ' ';
+		}
 		std::cout <<endl;
 		memDelta.clear();
 	}

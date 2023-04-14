@@ -9,6 +9,7 @@
 #include "requirements.hpp"
 using namespace std;
 struct Pipeline{
+
     int numberofstages;
     bool firstinfirstoutactive;
     bool bypassactive;
@@ -26,6 +27,7 @@ struct Pipeline{
     int timetaken;
     unordered_map<string, int> stagemap;
     int cycle;
+
     Pipeline(int in1, bool in2, bool in3, int in4, int in5, vector<string> in6,bool in7) {
         numberofstages = in1;
         firstinfirstoutactive= in7;
@@ -55,7 +57,9 @@ struct Pipeline{
         pseudoruntimelist.resize(0);
         cycle=-1;
     }
+
     struct Runtimedata* run_command(Command* in1){
+
     vector<int> v = {in1->destinationregister,in1->sourceregister1,in1->sourceregister2};
     vector<int> v1 = {in1->bypassindex1,in1->bypassindex2,in1->readindex,in1->writeindex};
     struct Command* command = new Command(false,in1->intermediatelatchlength,in1->stagelengths,v1,v,in1->stagenames,in1->opcode,in1->value,in1->constant);
@@ -64,6 +68,7 @@ struct Pipeline{
             command->stagelengths[i]+=command->intermediatelatchlength;
         }
     }
+
     if (symmetryactive){
         vector<int> temp1(command->numberofstages,*max_element(command->stagelengths.begin(),command->stagelengths.end()));
         command->stagelengths= temp1;
@@ -76,41 +81,57 @@ struct Pipeline{
             }
         }
     }
+
     bool firstinfirstouttemp=firstinfirstoutactive;
     if(command->destinationregister!=-1){
-        firstinfirstouttemp=false;}
+        firstinfirstouttemp=false;
+    }
     struct Runtimedata* runtime = new Runtimedata(command,stageemptytime[0],command->numberofstages);
     runtime->stagenames[0]=command->stagenames[0];
     runtime->stages[0]={pseudostageemptytime[stagemap[command->stagenames[0]]],-1};
     pseudostagestarttime[stagemap[command->stagenames[0]]]=pseudostageemptytime[stagemap[command->stagenames[0]]];
+
     for (int j=0;j<command->numberofstages-1;j++){
         int endtime = runtime->stages[j][0]+command->stagelengths[j];
         if (j+1==command->bypassindex1){
             if (bypassactive){
                 if (command->sourceregister1!=-1){
                     if(pseudoregisterfile->intermediateupdatetime[command->sourceregister1]>endtime){
-                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister1];}}}
+                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister1];
+                    }
+                }
+            }
             else{
                 if (command->sourceregister1 != -1){
                     if (pseudoregisterfile->updatetime[command->sourceregister1] > endtime){
-                        endtime = pseudoregisterfile->updatetime[command->sourceregister1];}}}
+                        endtime = pseudoregisterfile->updatetime[command->sourceregister1];
+                    }
+                }
+            }
         }
         if(j+1==command->bypassindex2){
             if(bypassactive){
                 if (command->sourceregister2!=-1){
                     if(pseudoregisterfile->intermediateupdatetime[command->sourceregister2]>endtime){
-                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister2];}}}
+                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister2];
+                    }
+                }
+            }
             else{
                 if (command->sourceregister2 != -1){
                     if (pseudoregisterfile->updatetime[command->sourceregister2] > endtime){
-                        endtime = pseudoregisterfile->updatetime[command->sourceregister2];}}}
+                        endtime = pseudoregisterfile->updatetime[command->sourceregister2];
+                    }
+                }
+            }
         }
         if (endtime<pseudostageemptytime[stagemap[command->stagenames[j+1]]] and (endtime>pseudostagestarttime[stagemap[command->stagenames[j+1]]] or firstinfirstouttemp)){
             endtime= pseudostageemptytime[stagemap[command->stagenames[j+1]]];
         }
         if(command->destinationregister!=-1){
             if(j==command->readindex){
-                pseudoregisterfile->intermediateupdatetime[command->destinationregister]=endtime;}
+                pseudoregisterfile->intermediateupdatetime[command->destinationregister]=endtime;
+            }
                 // new next two lines
             if (j==command->writeindex){
                 pseudoregisterfile->updatetime[command->destinationregister]=endtime;
@@ -142,6 +163,7 @@ struct Pipeline{
     pseudoruntimelist.push_back(runtime);
     return runtime;
     }
+
     void save() {
     history.insert(history.end(), pseudoruntimelist.begin(), pseudoruntimelist.end());
     if(pseudoruntimelist.size() > 0){
@@ -150,6 +172,7 @@ struct Pipeline{
     registerfile = pseudoregisterfile->copy_file();
     stageemptytime = pseudoregisterfile->copy_vector(pseudostageemptytime);
     }
+
     void restore() {
         if(pseudoruntimelist.size() > 0){
             pseudoruntimelist.clear();
@@ -157,6 +180,7 @@ struct Pipeline{
         pseudoregisterfile = registerfile->copy_file();
         pseudostageemptytime = registerfile->copy_vector(stageemptytime);
     }
+
     void insert_halt(Command* com) {
         stageemptytime[0] = history[(int)history.size()-1]->stages[com->readindex][1];
         pseudostageemptytime[0] = history[(int)history.size()-1]->stages[com->readindex][1];
@@ -166,11 +190,13 @@ struct Pipeline{
         pseudoregisterfile = registerfile->copy_file();
         pseudostageemptytime = registerfile->copy_vector(stageemptytime);
     }
+
     void print_pipeline() {
         for (int i = 0; i < (int)history.size(); i++) {
             history[i]->print_runtime();
         }
     }
+
     void print_table(){
         if(cycle<0){
             cerr << "Error: Pipeline is too asymetric to print a table" << endl;
@@ -228,4 +254,5 @@ struct Pipeline{
         }
     }
 };
+
 #endif

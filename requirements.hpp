@@ -6,8 +6,11 @@
 #include <unordered_map>
 #include <algorithm>
 #include <iostream>
+
 using namespace std;
+
 struct Command{
+
     public:
     bool intermediatelatchesactive;
     int intermediatelatchlength;
@@ -24,6 +27,7 @@ struct Command{
     string opcode;
     int value;
     int constant;
+
     Command(bool in1, int in2, vector<int> in3, vector<int> in4, vector<int> in5, vector<string> in6, string in7, int in8, int in9) {
         intermediatelatchesactive = in1;
         intermediatelatchlength = in2;
@@ -41,6 +45,7 @@ struct Command{
         value = in8;
         constant = in9;
     }
+
     void print_command() {
     cout << "intermediatelatchesactive: " << intermediatelatchesactive << endl;
     cout << "intermediatelatchlength: " << intermediatelatchlength << endl;
@@ -67,6 +72,7 @@ struct Command{
     cout << "constant: " << constant << endl;
 }
 };
+
 struct QueueNode {
     int register_id;
     int value;
@@ -74,17 +80,21 @@ struct QueueNode {
     QueueNode* next;
     QueueNode* prev;
 };
+
 struct UpdateQueue {
+
     QueueNode* head;
     QueueNode* tail;
     QueueNode* pointer;
     int size;
+
     UpdateQueue() {
         head = nullptr;
         tail = nullptr;
         pointer = nullptr;
         size = 0;
     }
+
     void enqueue(int in1,int in2,int in3) {
         QueueNode* newnode = new QueueNode;
         newnode->register_id = in1;
@@ -104,9 +114,11 @@ struct UpdateQueue {
         }
         size++;
     }
+
     vector<int> dequeue() {
         if (head == nullptr) {
-            return {-1,-1};}
+            return {-1,-1};
+        }
         QueueNode* oldhead = head;
         vector<int> data= {oldhead->value,oldhead->register_id};
         head = head->next;
@@ -120,6 +132,7 @@ struct UpdateQueue {
         return data;
         size--;
     }
+
     vector<int> peek() {
         if (pointer == nullptr) {
             return {-1,-1,-1};
@@ -127,21 +140,25 @@ struct UpdateQueue {
         vector<int> data = {pointer->value,pointer->register_id,pointer->updatetime};
         return data;
     }
+
     void move_left() {
         if (pointer == nullptr) {
             return;
         }
         pointer = pointer->prev;
     }
+
     void move_right() {
         if (pointer == nullptr) {
             return;
         }
         pointer = pointer->next;
     }
+
     bool is_empty() {
         return head == nullptr;
     }
+
     struct UpdateQueue* copy_queue() {
         struct UpdateQueue* newqueue = new UpdateQueue();
         QueueNode* temp = head;
@@ -152,12 +169,15 @@ struct UpdateQueue {
         return newqueue;
     }
 };
+
 struct Registerfile{
+
     int size;
     vector<int> updatetime;
     vector<int> intermediateupdatetime;
     vector<int> values;
     struct UpdateQueue* queue;
+
     Registerfile(int in1){
         size = in1;
         vector<int> temp1(in1, 0),temp2(in1,0),temp3(in1,0);
@@ -169,6 +189,7 @@ struct Registerfile{
         values = temp3;
         queue = new UpdateQueue();
     }
+
     struct vector<int> copy_vector(vector<int> in1) {
         struct vector<int> newvector(in1.size());
         for (int i = 0; i < (int)in1.size(); i++) {
@@ -176,6 +197,7 @@ struct Registerfile{
         }
         return newvector;
     }
+
     struct Registerfile* copy_file() {
         struct Registerfile* newregisterfile = new Registerfile(size);
         newregisterfile->size = size;
@@ -185,10 +207,12 @@ struct Registerfile{
         newregisterfile->queue = queue->copy_queue();
         return newregisterfile;
     }
+
     void make_update(int in1,int in2, int in3){
         updatetime[in1] = in3;
         values[in1] = in2;
     }
+
     vector<int> state_at_time(int in1, vector<int> file, int in2){
         vector<int> newregisterfile = copy_vector(file);
         queue->pointer = queue->head;
@@ -210,11 +234,14 @@ struct Registerfile{
         return newregisterfile;
     }
 };
+
 struct Runtimedata{
+
     Command* command;
     int starttime;
     vector<string> stagenames;
     vector<vector<int> > stages;
+
     Runtimedata(Command* in1, int in2, int in3) {
         command = in1;
         starttime = in2;
@@ -229,6 +256,7 @@ struct Runtimedata{
         }
         stages = temp1;
     }
+    
     void print_runtime() {
     for (int i = 0; i < (int)stagenames.size(); i++) {
         cout << stagenames[i] << " " << stages[i][0] << " " << stages[i][1] << endl;
@@ -236,4 +264,5 @@ struct Runtimedata{
     cout << endl;
     }
 };
+
 #endif
