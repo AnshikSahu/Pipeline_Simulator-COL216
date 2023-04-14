@@ -279,7 +279,7 @@ struct Simulator
 			std::cerr << '\n';
 		}
 		//pipeline->print_pipeline();
-		//print_final_output();
+		print_final_output();
 	}
 
 	// execute the commands sequentially (no pipelining)
@@ -354,12 +354,12 @@ struct Simulator
 	 void printRegistersAndMemoryDelta(int clockCycle,vector<int> reg,unordered_map<int, int> memDelta)
 	{
 		for (int i = 0; i < 32; ++i)
-			std::cout << registers[i] << ' ';
+			std::cout << reg[i] << ' ';
 		std::cout << '\n';
-		std::cout << memoryDelta.size() << ' ';
-		for (auto &p : memoryDelta)
+		std::cout << memDelta.size() << ' ';
+		for (auto &p : memDelta)
 			std::cout << (p.first) << ' ' << p.second << '\n';
-		memoryDelta.clear();
+		memDelta.clear();
 	}
 
 };
