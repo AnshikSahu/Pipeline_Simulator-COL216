@@ -24,6 +24,7 @@ struct Simulator
 	std::unordered_map<int, int> memoryDelta;
 	std::vector<std::vector<std::string>> commands;
 	std::vector<int> commandCount;
+	struct UpdateQueue* memoryupdatequeue;
 	enum exit_code
 	{
 		SUCCESS = 0,
@@ -42,6 +43,7 @@ struct Simulator
 		registerMap = parser->registerMap;
 		address = parser->address;
 		commandCount=parser->commandCount;
+		memoryupdatequeue=new UpdateQueue();
 		switch(question){
 			case 1:
 				pipeline=new Pipeline(5,false,true,32,0,{"IF","ID","EX","ME","WB"},true);
@@ -276,7 +278,8 @@ struct Simulator
 				std::cerr << s << ' ';
 			std::cerr << '\n';
 		}
-		pipeline->print_pipeline();
+		//pipeline->print_pipeline();
+		//print_final_output();
 	}
 
 	// execute the commands sequentially (no pipelining)
@@ -306,30 +309,56 @@ struct Simulator
 			}
 			++commandCount[PCcurr];
 			parser->parametric_commands[PCcurr]->value=registers[registerMap[command[1]]];
-			cout<<"command: "<<command[0]<<endl;
 			pipeline->run_command(parser->parametric_commands[PCcurr]);
-			cout<<"command done"<<endl;
 			pipeline->save();
-			cout<<"saved"<<endl;
 			if(command[0]=="beq" || command[0]=="bne" || command[0]=="j"){
 				pipeline->insert_halt(parser->parametric_commands[PCcurr]);
 			}
+			if(command[0]=="sw"){
+				updatememory(command,pipeline->history[(int)pipeline->history.size()-1]->stages[parser->parametric_commands[PCcurr]->readindex][1]);
+			}
 			PCcurr = PCnext;
-			printRegistersAndMemoryDelta(clockCyclesUnpipelined);
+			//printRegistersAndMemoryDelta(clockCyclesUnpipelined);
 		}
-		parser->print_commands();
+		//parser->print_commands();
 		handleExit(SUCCESS, clockCyclesUnpipelined);
 	}
 
+	void updatememory(std::vector<std::string> command,int time){
+		std::string location;
+		if(std::find(command[2].begin(),command[2].end(),'$')!=command[2].end()){
+			location=command[2];
+		}
+		else{
+			location=command[2]+"("+command[3]+")";
+		}
+		int address = locateAddress(location);
+		memoryupdatequeue->enqueue(address,registers[registerMap[command[1]]],time);
+	}
+
+	void print_final_output(){
+		vector<int> reg(32,0);
+		std::unordered_map<int, int> memDelta;
+		for(int i=0;i<pipeline->timetaken/pipeline->cycle;i++){
+			int time=(i+1)*pipeline->cycle;
+			printRegistersAndMemoryDelta(i+1,reg,memDelta);
+			pipeline->registerfile->state_at_time(time,reg,time-pipeline->cycle);
+			vector<int> temp=memoryupdatequeue->peek();
+			if(temp[2]<=time){
+				memDelta[temp[1]]=temp[2];
+				memoryupdatequeue->move_left();
+			}
+		}
+	}
 	// print the register data in hexadecimal
-	void printRegistersAndMemoryDelta(int clockCycle)
+	 void printRegistersAndMemoryDelta(int clockCycle,vector<int> reg,unordered_map<int, int> memDelta)
 	{
 		for (int i = 0; i < 32; ++i)
 			std::cout << registers[i] << ' ';
 		std::cout << '\n';
 		std::cout << memoryDelta.size() << ' ';
 		for (auto &p : memoryDelta)
-			std::cout << (p.first)*4 << ' ' << p.second << '\n';
+			std::cout << (p.first) << ' ' << p.second << '\n';
 		memoryDelta.clear();
 	}
 

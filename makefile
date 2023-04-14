@@ -7,4 +7,4 @@ clean:
 	rm sample
 
 run: sample
-	./sample sample.asm
+	./sample sample.asm >> output.txt

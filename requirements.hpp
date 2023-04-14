@@ -74,12 +74,12 @@ struct QueueNode {
     QueueNode* next;
     QueueNode* prev;
 };
-struct RegisterfileQueue {
+struct UpdateQueue {
     QueueNode* head;
     QueueNode* tail;
     QueueNode* pointer;
     int size;
-    RegisterfileQueue() {
+    UpdateQueue() {
         head = nullptr;
         tail = nullptr;
         pointer = nullptr;
@@ -147,8 +147,8 @@ struct RegisterfileQueue {
     bool is_empty() {
         return head == nullptr;
     }
-    struct RegisterfileQueue* copy_queue() {
-        struct RegisterfileQueue* newqueue = new RegisterfileQueue();
+    struct UpdateQueue* copy_queue() {
+        struct UpdateQueue* newqueue = new UpdateQueue();
         QueueNode* temp = head;
         while (temp != nullptr) {
             newqueue->enqueue(temp->register_id, temp->value, temp->updatetime);
@@ -162,7 +162,7 @@ struct Registerfile{
     vector<int> updatetime;
     vector<int> intermediateupdatetime;
     vector<int> values;
-    struct RegisterfileQueue* queue;
+    struct UpdateQueue* queue;
     Registerfile(int in1){
         size = in1;
         vector<int> temp1(in1, 0),temp2(in1,0),temp3(in1,0);
@@ -172,7 +172,7 @@ struct Registerfile{
         intermediateupdatetime = temp2;
         values.resize(size);
         values = temp3;
-        queue = new RegisterfileQueue();
+        queue = new UpdateQueue();
     }
     struct vector<int> copy_vector(vector<int> in1) {
         struct vector<int> newvector(in1.size());
@@ -194,12 +194,17 @@ struct Registerfile{
         updatetime[in1] = in3;
         values[in1] = in2;
     }
-    struct Registerfile* state_at_time(int in1){
-        struct Registerfile* newregisterfile = new Registerfile(size);
+    vector<int> state_at_time(int in1, vector<int> file, int in2){
+        vector<int> newregisterfile = copy_vector(file);
+        queue->pointer = queue->head;
         vector<int> temp = queue->peek();
         while(temp[0]!=-1){
-            if(temp[2]<=in1){
-                newregisterfile->make_update(temp[1],temp[2],temp[0]);
+            if(temp[2]<=in2){
+                queue->move_right();
+                temp = queue->peek();
+            }
+            else if(temp[2]<=in1){
+                newregisterfile[temp[1]] = temp[2];
                 queue->move_right();
                 temp = queue->peek();
             }
