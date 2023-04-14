@@ -52,7 +52,7 @@ struct Parser
         case 2:
 	    stage_names={{"add", { "IF", "ID", "EX", "ME", "WB" }}, {"sub", { "IF", "ID", "EX", "ME", "WB" }}, {"mul", { "IF", "ID", "EX", "ME", "WB" }}, {"beq", { "IF", "ID", "EX", "ME", "WB" }}, {"bne", { "IF", "ID", "EX", "ME", "WB" }}, {"slt", { "IF", "ID", "EX", "ME", "WB" }}, {"j", { "IF", "ID", "EX", "ME", "WB" }}, {"lw", { "IF", "ID", "EX", "ME", "WB" }}, {"lw_offset", { "IF", "ID", "EX", "ME", "WB" }}, {"sw", { "IF", "ID", "EX", "ME", "WB" }}, {"sw_offset", { "IF", "ID", "EX", "ME", "WB" }}, {"addi", { "IF", "ID", "EX", "ME", "WB" }}};
             parametrs={{1,20},{70,100,150,200,120}};
-            indices = {{"add", {2,2,2,4}}, {"sub", {2,2,2,4}}, {"mul", {2,2,2,4}}, {"beq", {2,2,2,-1}}, {"bne", {2,2,2,-1}}, {"slt", {2,2,2,4}}, {"j", {-1,-1,1,-1}}, {"lw", {2,-1,3,4}}, {"sw", {2,2,-1,-1}}, {"addi", {2,-1,2,4}}};
+            indices = {{"add", {2,2,2,4}}, {"sub", {2,2,2,4}}, {"mul", {2,2,2,4}}, {"beq", {2,2,2,-1}}, {"bne", {2,2,2,-1}}, {"slt", {2,2,2,4}}, {"j", {-1,-1,1,-1}}, {"lw", {2,-1,3,4}}, {"sw", {3,2,-1,-1}}, {"addi", {2,-1,2,4}}};
             break;
         case 3:
 	    stage_names={{"add", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"sub",{ "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"mul", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"beq", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"bne", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"slt", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"j", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"lw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"sw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"addi", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}};
