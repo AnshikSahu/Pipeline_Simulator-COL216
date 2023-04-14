@@ -39,38 +39,21 @@ struct Simulator
 		instructions = {{"add", &Simulator::add}, {"sub", &Simulator::sub}, {"mul", &Simulator::mul}, {"beq", &Simulator::beq}, {"bne", &Simulator::bne}, {"slt", &Simulator::slt}, {"j", &Simulator::j}, {"lw", &Simulator::lw}, {"sw", &Simulator::sw}, {"addi", &Simulator::addi}};
 		parser = new Parser(file,question);
 	    commands=parser->commands;
-		for (int i = 0; i < 32; ++i)
-			registerMap["$" + std::to_string(i)] = i;
-		registerMap["$zero"] = 0;
-		registerMap["$at"] = 1;
-		registerMap["$v0"] = 2;
-		registerMap["$v1"] = 3;
-		for (int i = 0; i < 4; ++i)
-			registerMap["$a" + std::to_string(i)] = i + 4;
-		for (int i = 0; i < 8; ++i)
-			registerMap["$t" + std::to_string(i)] = i + 8, registerMap["$s" + std::to_string(i)] = i + 16;
-		registerMap["$t8"] = 24;
-		registerMap["$t9"] = 25;
-		registerMap["$k0"] = 26;
-		registerMap["$k1"] = 27;
-		registerMap["$gp"] = 28;
-		registerMap["$sp"] = 29;
-		registerMap["$s8"] = 30;
-		registerMap["$ra"] = 31;
+		registerMap = parser->registerMap;
 		address = parser->address;
 		commandCount=parser->commandCount;
 		switch(question){
 			case 1:
-				pipeline=new Pipeline(5,false,true,32,0,{"IF","ID","EX","ME","WB"});
+				pipeline=new Pipeline(5,false,true,32,0,{"IF","ID","EX","ME","WB"},true);
 				break;
 			case 2:
-				pipeline=new Pipeline(5,true,true,32,0,{"IF","ID","EX","ME","WB"});
+				pipeline=new Pipeline(5,true,true,32,0,{"IF","ID","EX","ME","WB"},true);
 				break;
 			case 3:
-				pipeline=new Pipeline(9,false,true,32,0,{"IF1","IF2","ID1","ID2","RR","EX","MEM1","MEM2","WB"});
+				pipeline=new Pipeline(9,false,true,32,0,{"IF1","IF2","ID1","ID2","RR","EX","MEM1","MEM2","WB"},true);
 				break;
 			case 4:
-				pipeline=new Pipeline(9,true,true,32,0,{"IF1","IF2","ID1","ID2","RR","EX","MEM1","MEM2","WB"});
+				pipeline=new Pipeline(9,true,true,32,0,{"IF1","IF2","ID1","ID2","RR","EX","MEM1","MEM2","WB"},true);
 				break;
 			default:
 				cerr << "Invalid question number" << endl;
@@ -159,11 +142,9 @@ struct Simulator
 		}
 		if (!checkRegister(r) || registerMap[r] == 0)
 			return 1;
-		cout<<location<<endl;
 		int address = locateAddress(location);
 		if (address < 0)
 			return abs(address);
-		cout<<"Hurray"<<endl;
 		registers[registerMap[r]] = data[address];
 		PCnext = PCcurr + 1;
 		return 0;
@@ -196,18 +177,12 @@ struct Simulator
 			try
 			{
 				int lparen = location.find('('), offset = stoi(lparen == 0 ? "0" : location.substr(0, lparen));
-				cout<<"Test"<<lparen<<" "<<offset<<endl;
 				std::string reg = location.substr(lparen + 1);
-				cout<<reg<<endl;
 				reg.pop_back();
-				cout<<reg<<endl;
 				if (!checkRegister(reg))
-					cout<<location<<endl;
 					return -3;
-				cout<<"YAY"<<endl;
 				int address = registers[registerMap[reg]] + offset;
 				if (address % 4 || address < int(4 * commands.size()) || address >= MAX)
-					cout<<location<<endl;
 					return -3;
 				return address / 4;
 			}
@@ -220,7 +195,6 @@ struct Simulator
 		{
 			int address = stoi(location);
 			if (address % 4 || address < int(4 * commands.size()) || address >= MAX)
-				cout<<location<<endl;
 				return -3;
 			return address / 4;
 		}
@@ -332,8 +306,11 @@ struct Simulator
 			}
 			++commandCount[PCcurr];
 			parser->parametric_commands[PCcurr]->value=registers[registerMap[command[1]]];
+			cout<<"command: "<<command[0]<<endl;
 			pipeline->run_command(parser->parametric_commands[PCcurr]);
+			cout<<"command done"<<endl;
 			pipeline->save();
+			cout<<"saved"<<endl;
 			if(command[0]=="beq" || command[0]=="bne" || command[0]=="j"){
 				pipeline->insert_halt(parser->parametric_commands[PCcurr]);
 			}
@@ -355,6 +332,7 @@ struct Simulator
 			std::cout << (p.first)*4 << ' ' << p.second << '\n';
 		memoryDelta.clear();
 	}
+
 };
 
 #endif

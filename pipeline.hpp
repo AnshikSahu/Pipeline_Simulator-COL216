@@ -10,6 +10,7 @@
 using namespace std;
 struct Pipeline{
     int numberofstages;
+    bool firstinfirstoutactive;
     bool bypassactive;
     bool symmetryactive;
     vector<int> stageemptytime;
@@ -22,10 +23,12 @@ struct Pipeline{
     vector<Runtimedata*> pseudoruntimelist;
     vector<Runtimedata*> history;
     int starttime;
+    int timetaken;
     unordered_map<string, int> stagemap;
     int cycle;
-    Pipeline(int in1, bool in2, bool in3, int in4, int in5, vector<string> in6) {
+    Pipeline(int in1, bool in2, bool in3, int in4, int in5, vector<string> in6,bool in7) {
         numberofstages = in1;
+        firstinfirstoutactive= in7;
         bypassactive = in2;
         symmetryactive = in3;
         numberofregisters = in4;
@@ -44,6 +47,7 @@ struct Pipeline{
         vector<int> temp4(in1,0);
         pseudostagestarttime = temp4;
         starttime = in5;
+        timetaken = 0;
         for (int i = 0; i < (int)in6.size(); i++) {
             stagemap[in6[i]] = i;
         }
@@ -72,6 +76,9 @@ struct Pipeline{
             }
         }
     }
+    bool firstinfirstouttemp=firstinfirstoutactive;
+    if(command->destinationregister!=-1){
+        firstinfirstouttemp=false;}
     struct Runtimedata* runtime = new Runtimedata(command,stageemptytime[0],command->numberofstages);
     runtime->stagenames[0]=command->stagenames[0];
     runtime->stages[0]={pseudostageemptytime[stagemap[command->stagenames[0]]],-1};
@@ -82,35 +89,23 @@ struct Pipeline{
             if (bypassactive){
                 if (command->sourceregister1!=-1){
                     if(pseudoregisterfile->intermediateupdatetime[command->sourceregister1]>endtime){
-                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister1];
-                    }
-                }
-            }
+                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister1];}}}
             else{
                 if (command->sourceregister1 != -1){
                     if (pseudoregisterfile->updatetime[command->sourceregister1] > endtime){
-                        endtime = pseudoregisterfile->updatetime[command->sourceregister1];
-                    }
-                }           
-            }
+                        endtime = pseudoregisterfile->updatetime[command->sourceregister1];}}}
         }
         if(j+1==command->bypassindex2){
             if(bypassactive){
                 if (command->sourceregister2!=-1){
                     if(pseudoregisterfile->intermediateupdatetime[command->sourceregister2]>endtime){
-                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister2];
-                    }
-                }
-            }
+                        endtime=pseudoregisterfile->intermediateupdatetime[command->sourceregister2];}}}
             else{
                 if (command->sourceregister2 != -1){
                     if (pseudoregisterfile->updatetime[command->sourceregister2] > endtime){
-                        endtime = pseudoregisterfile->updatetime[command->sourceregister2];
-                    }
-                }   
-            }
+                        endtime = pseudoregisterfile->updatetime[command->sourceregister2];}}}
         }
-        if (endtime<pseudostageemptytime[stagemap[command->stagenames[j+1]]] and endtime>pseudostagestarttime[stagemap[command->stagenames[j+1]]]){
+        if (endtime<pseudostageemptytime[stagemap[command->stagenames[j+1]]] and (endtime>pseudostagestarttime[stagemap[command->stagenames[j+1]]] or firstinfirstouttemp)){
             endtime= pseudostageemptytime[stagemap[command->stagenames[j+1]]];
         }
         if(command->destinationregister!=-1){
@@ -129,6 +124,9 @@ struct Pipeline{
         pseudostagestarttime[stagemap[command->stagenames[j+1]]]=endtime;
     }
     pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]]=runtime->stages[command->numberofstages-1][0]+command->stagelengths[command->numberofstages-1];
+    if(pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]]>timetaken){
+        timetaken=pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]];
+    }
     if(command->destinationregister!=-1){
         if(command->writeindex==command->numberofstages-1){
             pseudoregisterfile->updatetime[command->destinationregister]=pseudostageemptytime[stagemap[command->stagenames[command->numberofstages-1]]];
@@ -177,9 +175,7 @@ struct Pipeline{
         if(cycle<0){
             cerr << "Error: Pipeline is too asymetric to print a table" << endl;
         }
-        vector<vector<int>> last=history[(int)history.size()-1]->stages;
-        int lastcycle=last[(int)last.size()-1][1];
-        int numcycles=lastcycle/cycle;
+        int numcycles=timetaken/cycle;
         cout<<"   ||";
         for (int i = 0; i < numcycles; i++) {
             cout<<i<<"";
@@ -223,7 +219,7 @@ struct Pipeline{
                     std::cout<<"  * |";
                 }
             }
-            int z=lastcycle-history[i]->stages[(int)history[i]->stages.size()-1][1];
+            int z=timetaken-history[i]->stages[(int)history[i]->stages.size()-1][1];
             int m=z/cycle;
             for(;m>0;m--){
                 std::cout<<"    |";
