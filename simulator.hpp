@@ -278,7 +278,6 @@ struct Simulator
 				std::cerr << s << ' ';
 			std::cerr << '\n';
 		}
-		//pipeline->print_pipeline();
 		print_final_output();
 	}
 
@@ -318,9 +317,7 @@ struct Simulator
 				updatememory(command,pipeline->history[(int)pipeline->history.size()-1]->stages[parser->parametric_commands[PCcurr]->readindex][1]);
 			}
 			PCcurr = PCnext;
-			//printRegistersAndMemoryDelta(clockCyclesUnpipelined);
 		}
-		//parser->print_commands();
 		handleExit(SUCCESS, clockCyclesUnpipelined);
 	}
 
