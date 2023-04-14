@@ -339,26 +339,30 @@ struct Simulator
 	void print_final_output(){
 		vector<int> reg(32,0);
 		std::unordered_map<int, int> memDelta;
-		for(int i=0;i<pipeline->timetaken/pipeline->cycle;i++){
+		int numberofclockcycles=pipeline->timetaken/pipeline->cycle;
+		for(int i=0;i<numberofclockcycles;i++){
 			int time=(i+1)*pipeline->cycle;
 			printRegistersAndMemoryDelta(i+1,reg,memDelta);
-			pipeline->registerfile->state_at_time(time,reg,time-pipeline->cycle);
+			memDelta={};
+			reg=pipeline->registerfile->state_at_time(time,reg,time-pipeline->cycle);
 			vector<int> temp=memoryupdatequeue->peek();
-			if(temp[2]<=time){
-				memDelta[temp[1]]=temp[2];
-				memoryupdatequeue->move_left();
+			if(temp[2]<=time and temp[2]>time-pipeline->cycle){
+				memDelta[temp[1]]=temp[0];
+				memoryupdatequeue->move_right();
 			}
 		}
+		printRegistersAndMemoryDelta(numberofclockcycles,reg,memDelta);
 	}
 	// print the register data in hexadecimal
 	 void printRegistersAndMemoryDelta(int clockCycle,vector<int> reg,unordered_map<int, int> memDelta)
 	{
 		for (int i = 0; i < 32; ++i)
 			std::cout << reg[i] << ' ';
-		std::cout << '\n';
+		std::cout << endl;
 		std::cout << memDelta.size() << ' ';
 		for (auto &p : memDelta)
-			std::cout << (p.first) << ' ' << p.second << '\n';
+			std::cout << (p.first) << ' ' << p.second << ' ';
+		std::cout <<endl;
 		memDelta.clear();
 	}
 

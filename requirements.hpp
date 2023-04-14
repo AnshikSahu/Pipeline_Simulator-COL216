@@ -102,6 +102,7 @@ struct UpdateQueue {
             newnode->prev = tail;
             tail = newnode;
         }
+        size++;
     }
     vector<int> dequeue() {
         if (head == nullptr) {
@@ -130,16 +131,10 @@ struct UpdateQueue {
         if (pointer == nullptr) {
             return;
         }
-        if (pointer->prev == nullptr) {
-            return;
-        }
         pointer = pointer->prev;
     }
     void move_right() {
         if (pointer == nullptr) {
-            return;
-        }
-        if (pointer->next == nullptr) {
             return;
         }
         pointer = pointer->next;
@@ -204,7 +199,7 @@ struct Registerfile{
                 temp = queue->peek();
             }
             else if(temp[2]<=in1){
-                newregisterfile[temp[1]] = temp[2];
+                newregisterfile[temp[1]] = temp[0];
                 queue->move_right();
                 temp = queue->peek();
             }
