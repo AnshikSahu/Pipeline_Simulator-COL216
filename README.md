@@ -6,7 +6,7 @@
 2. pipeline.hpp
 3. parser.hpp
 4. simulator.hpp
-5. configurations.hpp
+5. configuration.hpp
 5. branchpredictor.hpp
 6. branchpredictertester.cpp
 7. 5stage.cpp
@@ -27,4 +27,13 @@
 
 ####Structures:
 
-- a
+- **configuration.hpp:**
+  1.Configuration=> Generates the configuration parameters for the simulator based on question number.
+- **requirements.hpp:**
+  1. Command=> Defines the structure of a command.
+  2. QueueNode=> A node with three integer values.
+  3. UpdateQueue=> A queue to keep track of update history in memory and register file.
+  4. Registerfile=> Defines a register file and also takes over the functionality of latches.
+  5. Runtimedata=> Stores the start and endtime of each stage of an instruction.
+  
+  
