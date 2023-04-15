@@ -1,6 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include "branchP.cpp"
+#include "branchpredictor.hpp"
 using namespace std;
 int main(int argc, char** argv) {
 
@@ -8,7 +8,9 @@ int main(int argc, char** argv) {
     ifstream input(argv[1]);
 
     // Create branch predictor
-    BHRBranchPredictor bp(2);
+    int size= (1<<16);
+    int start=0;
+    SaturatingBHRBranchPredictor bp(start,size);
 
     // Read branches from file and verify predictions
     uint32_t pc;
@@ -25,7 +27,7 @@ int main(int argc, char** argv) {
         bp.update(pc, expected);
     }
     double fraction = static_cast<double>(count) / total;
-    cout<<(fraction)<<endl;
+    cout<<(100*fraction)<<"%"<<endl;
 
     return 0;
 }

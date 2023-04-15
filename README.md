@@ -16,6 +16,7 @@
 11. 79stage_bypass.cpp
 12. Makefile
 13. README.md
+14. report.pdf
 
 #### Instructions: write the MIPS assembly code in a file and save it as input.asm. Then use the following make commands to simulate a pipeline.
 
@@ -53,5 +54,9 @@
 
 ### Design Decesions:
   
-  
-  
+- For first in first out, the stalls are inserted only before WB stage.
+- There can be two WB stages in the same cycle for a 7-9 pipeline if one of them is non operational.
+- For 7-9 stage pipeline, the stages in which the stalls occur are sometimes interchanged for simplicity of the design. This does not affect the overall pipeline.
+- In 7-9 stage pipeline without byassing, regsiters can only be read at RR stage. 
+- In 5 stage pipeline, the registers in Regsiter File can be read anywhere. 
+- **There are no latches or cycles in the code and the stages are just represented as a block of delay and have no functionality of their own. The functionality of the code is executed separately from the pipeline.**
