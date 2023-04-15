@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 	std::ifstream file(argv[1]);
 	Simulator *mips;
 	if (file.is_open())
-		mips = new Simulator(file,1);
+		mips = new Simulator(file,2);
 	else
 	{
 		std::cerr << "File could not be opened. Terminating...\n";
