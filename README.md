@@ -18,6 +18,8 @@
 13. README.md
 14. report.pdf
 
+**Active instructions: add, and, or, sub, mul, slt, sll, srl, bne, beq, j, addi, lw, sw.**
+
 #### Instructions: write the MIPS assembly code in a file and save it as input.asm. Then use the following make commands to simulate a pipeline.
 
 1. all - to update all dependencies

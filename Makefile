@@ -14,6 +14,21 @@ clean:
 	rm pipelinesimulator79
 	rm pipelinesimulator79b
 
+pipelinesimulator: requirements.hpp pipeline.hpp parser.hpp simulator.hpp configuration.hpp main.cpp
+	g++ requirements.hpp pipeline.hpp parser.hpp simulator.hpp configuration.hpp main.cpp -o pipelinesimulator
+
+pipelinesimulator5: requirements.hpp pipeline.hpp parser.hpp simulator.hpp configuration.hpp 5stage.cpp
+	g++ requirements.hpp pipeline.hpp parser.hpp simulator.hpp configuration.hpp 5stage.cpp -o pipelinesimulator5
+
+pipelinesimulator5b: requirements.hpp pipeline.hpp parser.hpp simulator.hpp configuration.hpp 5stage_bypass.cpp
+	g++ requirements.hpp pipeline.hpp parser.hpp simulator.hpp configuration.hpp 5stage_bypass.cpp -o pipelinesimulator5b
+
+pipelinesimulator79: requirements.hpp pipeline.hpp parser.hpp simulator.hpp configuration.hpp 79stage.cpp
+	g++ requirements.hpp pipeline.hpp parser.hpp simulator.hpp configuration.hpp 79stage.cpp -o pipelinesimulator79
+
+pipelinesimulator79b: requirements.hpp pipeline.hpp parser.hpp simulator.hpp configuration.hpp 79stage_bypass.cpp
+	g++ requirements.hpp pipeline.hpp parser.hpp simulator.hpp configuration.hpp 79stage_bypass.cpp -o pipelinesimulator79b
+
 run_5stage: pipelinesimulator5
 	./pipelinesimulator5 1 input.asm
 

@@ -40,7 +40,7 @@ struct Simulator
 	// constructor to initialise the instruction set
 	Simulator(std::ifstream &file,int question)
 	{
-		instructions = {{"add", &Simulator::add}, {"sub", &Simulator::sub}, {"mul", &Simulator::mul}, {"beq", &Simulator::beq}, {"bne", &Simulator::bne}, {"slt", &Simulator::slt}, {"j", &Simulator::j}, {"lw", &Simulator::lw}, {"sw", &Simulator::sw}, {"addi", &Simulator::addi}};
+		instructions = {{"add", &Simulator::add}, {"and", &Simulator::And}, {"or", &Simulator::Or}, {"sub", &Simulator::sub}, {"mul", &Simulator::mul}, {"beq", &Simulator::beq}, {"bne", &Simulator::bne}, {"slt", &Simulator::slt}, {"j", &Simulator::j}, {"lw", &Simulator::lw}, {"sw", &Simulator::sw}, {"addi", &Simulator::addi}, {"sll", &Simulator::sll}, {"srl", &Simulator::srl}};
 		parser = new Parser(file,question);
 	    commands=parser->commands;
 		registerMap = parser->registerMap;
@@ -54,6 +54,17 @@ struct Simulator
 	{
 		return op(r1, r2, r3, [&](int a, int b)
 				  { return a + b; });
+	}
+	// perform and operation
+	int And(std::string r1, std::string r2, std::string r3)
+	{
+		return op(r1, r2, r3, [&](int a, int b)
+				  { return a & b; });
+	}// perform or operation
+	int Or(std::string r1, std::string r2, std::string r3)
+	{
+		return op(r1, r2, r3, [&](int a, int b)
+				  { return a | b; });
 	}
 	// perform subtraction operation
 	int sub(std::string r1, std::string r2, std::string r3)
@@ -225,6 +236,40 @@ struct Simulator
 			return 4;
 		}
 	}
+	// perform shift left operation
+	int sll(std::string r1, std::string r2, std::string num)
+	{
+		if (!checkRegisters({r1, r2}) || registerMap[r1] == 0){
+			return 1;
+		}
+		try
+		{
+			registers[registerMap[r1]] = (registers[registerMap[r2]] << stoi(num));
+			PCnext = PCcurr + 1;
+			return 0;
+		}
+		catch (std::exception &e)
+		{
+			return 4;
+		}
+	}
+	// perform shift right operation
+	int srl(std::string r1, std::string r2, std::string num)
+	{
+		if (!checkRegisters({r1, r2}) || registerMap[r1] == 0){
+			return 1;
+		}
+		try
+		{
+			registers[registerMap[r1]] = (registers[registerMap[r2]] >> stoi(num));
+			PCnext = PCcurr + 1;
+			return 0;
+		}
+		catch (std::exception &e)
+		{
+			return 4;
+		}
+	}	
 	// checks if label is valid
 	inline bool checkLabel(std::string str)
 	{

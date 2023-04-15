@@ -62,7 +62,7 @@ struct Parser
         int in2=parametrs[0][1];
         vector<int> in4=indices[command[0]];
         vector<int> in5;
-        vector<string> command_type1={"add","sub","and","or","slt","mul"}, command_type2={"addi","andi","ori"};
+        vector<string> command_type1={"add","sub","and","or","slt","mul","and","or"}, command_type2={"addi","andi","ori","sll","srl"};
 		vector<string> command_type3={"beq","bne"}, command_type4={"j","jal"};
 		int in9;
 		std::vector<std::string> subsetVec;
