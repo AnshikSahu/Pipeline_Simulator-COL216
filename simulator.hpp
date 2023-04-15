@@ -47,23 +47,7 @@ struct Simulator
 		address = parser->address;
 		commandCount=parser->commandCount;
 		memoryupdatequeue=new UpdateQueue();
-		switch(question){
-			case 1:
-				pipeline=new Pipeline(5,false,true,32,0,{"IF","ID","EX","ME","WB"},true);
-				break;
-			case 2:
-				pipeline=new Pipeline(5,true,true,32,0,{"IF","ID","EX","ME","WB"},true);
-				break;
-			case 3:
-				pipeline=new Pipeline(9,false,true,32,0,{"IF1","IF2","ID1","ID2","RR","EX","MEM1","MEM2","WB"},true);
-				break;
-			case 4:
-				pipeline=new Pipeline(9,true,true,32,0,{"IF1","IF2","ID1","ID2","RR","EX","MEM1","MEM2","WB"},true);
-				break;
-			default:
-				cerr << "Invalid question number" << endl;
-				break;
-		}
+		pipeline=parser->pipeline;
 	}
 	// perform add operation
 	int add(std::string r1, std::string r2, std::string r3)
@@ -187,7 +171,7 @@ struct Simulator
 		PCnext = PCcurr + 1;
 		return 0;
 	}
-	
+
 	int locateAddress(std::string location)
 	{
 		if (location.back() == ')')

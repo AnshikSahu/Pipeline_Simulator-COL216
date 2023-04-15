@@ -1,21 +1,19 @@
-#include "parser.hpp"
-#include "requirements.hpp"
+#include "readconfig.hpp"
 
 using namespace std;
-
+#include <iostream>
+#include <fstream>
+#include <unordered_map>
+#include <vector>
+#include <string>
+#include <sstream>
 int main(){
-    ifstream file("sample.asm");
-    struct Parser* parser = new Parser(file,1);
-    vector<struct Command*> commands = parser->parametric_commands;
-    for(int i = 0; i < (int)commands.size(); i++){
-        commands[i]->print_command();
-    }
-    struct Pipeline* pipeline = new Pipeline(5,false,true,32,0,{"IF","ID","EX","MEM","WB"});
-    cout << "Pipeline:" << endl;
-    for(int i = 0; i < (int)commands.size(); i++){
-        Runtimedata* runtime=pipeline->run_command(commands[i]);
-        pipeline->save();
-    }
-    pipeline->print_pipeline();
-    return 0;
+    std::unordered_map<std::string, std::vector<std::string>> stage_names;
+    std::vector<std::vector<int>> parameters;
+    std::unordered_map<std::string, std::vector<int>> indices;
+    Configuration *config = new Configuration("data.txt");
+    config->read_data_from_file();
+    stage_names = config->stage_names;
+    parameters = config->parameters;
+    indices = config->indices;
 }

@@ -1,5 +1,6 @@
 #ifndef __parser__
 #define __parser__
+
 #include <unordered_map>
 #include <string>
 #include <functional>
@@ -12,17 +13,21 @@
 #include <boost/tokenizer.hpp>
 #include "requirements.hpp"
 #include "pipeline.hpp"
+#include "configuration.hpp"
+
 using namespace std;
+
 struct Parser
 {
     vector< struct Command* > parametric_commands;
     vector<vector<int>> parametrs;
     std:: unordered_map<string,vector<int>> indices;
     std:: unordered_map<string,vector<string>> stage_names;
+	struct Pipeline *pipeline;
 	std::unordered_map<std::string, int> registerMap, address;
 	std::vector<std::vector<std::string>> commands;
 	std::vector<int> commandCount;
-	
+
 	Parser(std::ifstream &file, int question)
 	{
 		for (int i = 0; i < 32; ++i)
@@ -43,32 +48,11 @@ struct Parser
 		registerMap["$sp"] = 29;
 		registerMap["$s8"] = 30;
 		registerMap["$ra"] = 31;
-        switch (question)
-        {
-        case 1:
-            stage_names={{"add", { "IF", "ID", "EX", "ME", "WB" }}, {"sub", { "IF", "ID", "EX", "ME", "WB" }}, {"mul", { "IF", "ID", "EX", "ME", "WB" }}, {"beq", { "IF", "ID", "EX", "ME", "WB" }}, {"bne", { "IF", "ID", "EX", "ME", "WB" }}, {"slt", { "IF", "ID", "EX", "ME", "WB" }}, {"j", { "IF", "ID", "EX", "ME", "WB" }}, {"lw", { "IF", "ID", "EX", "ME", "WB" }}, {"lw_offset", { "IF", "ID", "EX", "ME", "WB" }}, {"sw", { "IF", "ID", "EX", "ME", "WB" }}, {"sw_offset", { "IF", "ID", "EX", "ME", "WB" }}, {"addi", { "IF", "ID", "EX", "ME", "WB" }}};
-            parametrs={{1,20},{70,100,150,200,120}};
-            indices = {{"add", {2,2,2,4}}, {"sub", {2,2,2,4}}, {"mul", {2,2,2,4}}, {"beq", {2,2,2,-1}}, {"bne", {2,2,2,-1}}, {"slt", {2,2,2,4}}, {"j", {-1,-1,1,-1}}, {"lw", {2,-1,3,4}}, {"sw", {2,2,3,-1}}, {"addi", {2,-1,2,4}}};
-            break;
-        case 2:
-	    stage_names={{"add", { "IF", "ID", "EX", "ME", "WB" }}, {"sub", { "IF", "ID", "EX", "ME", "WB" }}, {"mul", { "IF", "ID", "EX", "ME", "WB" }}, {"beq", { "IF", "ID", "EX", "ME", "WB" }}, {"bne", { "IF", "ID", "EX", "ME", "WB" }}, {"slt", { "IF", "ID", "EX", "ME", "WB" }}, {"j", { "IF", "ID", "EX", "ME", "WB" }}, {"lw", { "IF", "ID", "EX", "ME", "WB" }}, {"lw_offset", { "IF", "ID", "EX", "ME", "WB" }}, {"sw", { "IF", "ID", "EX", "ME", "WB" }}, {"sw_offset", { "IF", "ID", "EX", "ME", "WB" }}, {"addi", { "IF", "ID", "EX", "ME", "WB" }}};
-            parametrs={{1,20},{70,100,150,200,120}};
-            indices = {{"add", {2,2,2,4}}, {"sub", {2,2,2,4}}, {"mul", {2,2,2,4}}, {"beq", {2,2,2,-1}}, {"bne", {2,2,2,-1}}, {"slt", {2,2,2,4}}, {"j", {-1,-1,1,-1}}, {"lw", {2,-1,3,4}}, {"sw", {3,2,3,-1}}, {"addi", {2,-1,2,4}}};
-            break;
-        case 3:
-	    stage_names={{"add", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"sub",{ "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"mul", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"beq", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"bne", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"slt", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"j", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"lw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"sw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"addi", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}};
-            parametrs={{1,20},{35,35,33,33,33,150,100,100,120}};
-            indices = {{"add", {4,4,5,6}}, {"sub", {4,4,5,6}}, {"mul", {4,4,5,6}}, {"beq", {4,4,5,-1}}, {"bne", {4,4,5,-1}}, {"slt", {4,4,5,6}}, {"j", {-1,-1,3,-1}}, {"lw", {4,-1,7,8}}, {"sw", {4,4,7,-1}}, {"addi", {4,-1,5,6}}};
-            break;
-        case 4:
-	    stage_names={{"add", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"sub",{ "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"mul", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"beq", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"bne", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"slt", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"j", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}, {"lw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"sw", { "IF1","IF2", "ID1","ID2","RR", "EX","MEM1","MEM2","WB" }}, {"addi", { "IF1","IF2", "ID1","ID2","RR", "EX","WB" }}};
-            parametrs={{1,20},{35,35,33,33,33,150,100,100,120}};
-            indices = {{"add", {5,5,5,6}}, {"sub", {5,5,5,6}}, {"mul", {5,5,5,6}}, {"beq", {5,5,5,-1}}, {"bne", {5,5,5,-1}}, {"slt", {5,5,5,6}}, {"j", {-1,-1,3,-1}}, {"lw", {5,-1,7,8}}, {"sw", {6,5,7,-1}}, {"addi", {5,-1,5,6}}};
-            break;
-        default:
-            std:: cerr << "Invalid question number" << std::endl;
-            break;
-        }
+		struct Configuration* config = new Configuration(question);
+		parametrs = config->parametrs;
+		indices = config->indices;
+		stage_names = config->stage_names;
+		pipeline = config->pipeline;
 		constructCommands(file);
 		commandCount.assign(commands.size(), 0);
 	}
