@@ -46,30 +46,9 @@
 - **simulator.hpp:**
   1. Simulator=> Simulates mips architectue pipeline according to the configurations.
 - **simulator.hpp:**
-  1. SaturatingBranchPredictor=> maintains 214 counters, each in-
-dexed by the last 14 bits of the Program Counter. Corresponding to
-each branch, we go to its counter and predict branch taken if value
-of the counter is greater than or equal to 2 and not taken otherwise.
-If the branch is taken, the counter is incremented by one (if not in
-the highest state i.e. 3) else the counter is decremented by one (if
-not in the lowest state i.e. 0)
-  2. BHRBranchPredictor=> maintains 4 counters, each corresponding
-to one value of the Branch History Register(bhr). Corresponding to
-3
-each bhr, we go to its counter and predict branch taken if value of
-the counter is greater than or equal to 2 and not taken otherwise. If
-the branch is taken, the counter is incremented by one (if not in the
-highest state i.e. 3) else the counter is decremented by one (if not
-in the lowest state i.e. 0). Bhr is updated according to the expected
-result of the latest branch.
-  3. SaturatingBHRBranchPredictor=> maintains 216 counters, each
-indexed by the bit combination of the last 14 bits of the Program
-Counter and value stored in bhr. Corresponding to each index, we
-go to its counter and predict the branch to be taken if the value of
-the counter is greater than or equal to 2 and not taken otherwise. If
-the branch is taken, the counter is incremented by one (if not in the
-highest state i.e. 3) else the counter is decremented by one (if not in
-the lowest state i.e. 0)
+  1. SaturatingBranchPredictor=> Makes predictions based on the history of that particular branch. 
+  2. BHRBranchPredictor=> Makes predictions based on the history of the entire file. 
+  3. SaturatingBHRBranchPredictor=> Predicts which of the above two strategies should be used for making predictions and then uses it for prediction. 
   
   
 ##### Other files:
